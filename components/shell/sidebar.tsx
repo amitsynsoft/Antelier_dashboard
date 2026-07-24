@@ -1,10 +1,10 @@
 "use client"
 
 import * as React from "react"
-import Image from "next/image"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { navigationGroups } from "@/mock/dashboard-data"
-import { UserProfileDropdown } from "./user-profile-dropdown"
 import {
   LayoutDashboard,
   Users,
@@ -52,7 +52,20 @@ export function Sidebar({
   onTriggerDemo,
   className,
 }: SidebarProps) {
-  const [activeTab, setActiveTab] = React.useState("Dashboard")
+  const pathname = usePathname()
+  const [activeHash, setActiveHash] = React.useState<string>("")
+
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      setActiveHash(window.location.hash)
+      const handleHashChange = () => setActiveHash(window.location.hash)
+      window.addEventListener("hashchange", handleHashChange)
+      return () => window.removeEventListener("hashchange", handleHashChange)
+    }
+  }, [])
+
+  const isDashboardActive =
+    pathname === "/dashboard" && (!activeHash || activeHash === "")
 
   return (
     <aside
@@ -68,8 +81,9 @@ export function Sidebar({
         <div className="flex h-16 shrink-0 flex-col justify-center border-b border-border/50 px-4">
           <div className="flex items-center justify-between">
             {!collapsed ? (
-              <a
-                href="#"
+              <Link
+                href="/dashboard"
+                onClick={() => setActiveHash("")}
                 className="group flex flex-col transition-opacity hover:opacity-90"
               >
                 <div className="flex items-center gap-2.5">
@@ -83,16 +97,20 @@ export function Sidebar({
                     </span>
                   </span>
                 </div>
-              </a>
+                <p className="mt-1 truncate text-xs font-semibold tracking-tight text-muted-foreground">
+                  Configurable AI Client Intake Platform
+                </p>
+              </Link>
             ) : (
-              <a
-                href="#"
+              <Link
+                href="/dashboard"
+                onClick={() => setActiveHash("")}
                 className="mx-auto flex items-center justify-center transition-transform hover:scale-105"
               >
                 <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#0E1A24] shadow-2xs dark:bg-stone-100">
                   <span className="h-2.5 w-2.5 rounded-full bg-[#D97349]" />
                 </span>
-              </a>
+              </Link>
             )}
 
             <button
@@ -112,28 +130,35 @@ export function Sidebar({
 
         {/* Navigation List */}
         <div className="no-scrollbar flex-1 space-y-5 overflow-y-auto px-3 py-3">
-          {/* Dashboard Item */}
+          {/* Main Dashboard Link */}
           <div className="space-y-1">
-            <a
-              href="#"
-              onClick={() => setActiveTab("Dashboard")}
+            <Link
+              href="/dashboard"
+              onClick={() => setActiveHash("")}
               className={cn(
-                "group relative flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all duration-150",
-                activeTab === "Dashboard"
-                  ? "bg-primary text-primary-foreground shadow-2xs"
-                  : "text-muted-foreground hover:bg-muted/80 hover:text-foreground"
+                "group relative flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-150",
+                isDashboardActive
+                  ? "bg-primary/15 font-extrabold text-primary shadow-2xs"
+                  : "text-muted-foreground hover:bg-muted/70 hover:text-foreground"
               )}
             >
-              <LayoutDashboard className="h-4.5 w-4.5 shrink-0" />
+              <LayoutDashboard
+                className={cn(
+                  "h-4.5 w-4.5 shrink-0 transition-transform group-hover:scale-105",
+                  isDashboardActive
+                    ? "text-primary"
+                    : "text-muted-foreground group-hover:text-foreground"
+                )}
+              />
               {!collapsed && <span>Dashboard</span>}
-            </a>
+            </Link>
           </div>
 
           {/* Grouped Navigation Hierarchy */}
           {navigationGroups.map((group, idx) => (
             <div key={idx} className="space-y-1.5">
               {!collapsed && (
-                <div className="px-2.5 font-sans text-[10px] font-bold tracking-wider text-muted-foreground/60 uppercase">
+                <div className="px-2.5 font-sans text-xs font-bold tracking-wider text-muted-foreground/70 uppercase">
                   {group.groupLabel}
                 </div>
               )}
@@ -141,17 +166,35 @@ export function Sidebar({
               <nav className="space-y-0.5">
                 {group.items.map((item) => {
                   const Icon = iconMap[item.icon] || LayoutDashboard
-                  const isActive = activeTab === item.title
+
+                  // Strict active matching to prevent multiple active highlights
+                  let isActive = false
+                  if (item.href.startsWith("/dashboard#")) {
+                    const itemHash = item.href.split("#")[1]
+                    isActive =
+                      pathname === "/dashboard" && activeHash === `#${itemHash}`
+                  } else {
+                    isActive =
+                      pathname === item.href ||
+                      (item.href !== "/dashboard" &&
+                        pathname.startsWith(item.href))
+                  }
 
                   return (
-                    <a
+                    <Link
                       key={item.title}
                       href={item.href}
-                      onClick={() => setActiveTab(item.title)}
+                      onClick={() => {
+                        if (item.href.includes("#")) {
+                          setActiveHash(`#${item.href.split("#")[1]}`)
+                        } else {
+                          setActiveHash("")
+                        }
+                      }}
                       className={cn(
                         "group relative flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-all duration-150",
                         isActive
-                          ? "bg-primary/15 font-bold text-primary shadow-2xs"
+                          ? "bg-primary/15 font-extrabold text-primary shadow-2xs"
                           : "text-muted-foreground hover:bg-muted/70 hover:text-foreground"
                       )}
                       title={collapsed ? item.title : undefined}
@@ -168,7 +211,7 @@ export function Sidebar({
                       {!collapsed && (
                         <span className="truncate">{item.title}</span>
                       )}
-                    </a>
+                    </Link>
                   )
                 })}
               </nav>
@@ -179,7 +222,7 @@ export function Sidebar({
 
       {/* Bottom Section: Contextual Demo Card & User Profile Footer */}
       {!collapsed && (
-        <div className="space-y-3 border-t border-border/50 p-3">
+        <div className="space-y-3 border-t border-border/50 p-3 py-5">
           {/* Contextual Demo Card */}
           <div className="space-y-2.5 rounded-2xl border border-primary/25 bg-gradient-to-br from-primary/10 via-card to-card p-3.5 shadow-2xs">
             <div className="flex items-center gap-2">
@@ -188,7 +231,7 @@ export function Sidebar({
                 Ready to launch your AI?
               </p>
             </div>
-            <p className="text-[11px] leading-snug text-muted-foreground">
+            <p className="text-xs leading-snug text-muted-foreground">
               Run a complete client intake simulation using your current
               configuration.
             </p>
@@ -200,11 +243,6 @@ export function Sidebar({
               <Play className="h-3.5 w-3.5 fill-current" />
               <span>Run Demo Conversation</span>
             </button>
-          </div>
-
-          {/* User Profile Footer */}
-          <div className="pt-0.5">
-            <UserProfileDropdown />
           </div>
         </div>
       )}

@@ -1,10 +1,9 @@
 "use client"
 
 import * as React from "react"
-import { PageHeader } from "@/components/ui/page-header"
-import { SectionCard } from "@/components/ui/section-card"
+import { AppPage, PageHeader } from "@/components/layout/app-page"
 import { BusinessProfileForm } from "@/components/forms/business-profile-form"
-import { Building2, Save, Check } from "lucide-react"
+import { Building2, Check } from "lucide-react"
 
 export function BusinessProfileView() {
   const [savedNotice, setSavedNotice] = React.useState(false)
@@ -15,23 +14,24 @@ export function BusinessProfileView() {
   }
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto pb-8 animate-in fade-in-50">
+    <AppPage>
       <PageHeader
         title="Business Profile & Intake Positioning"
-        description="Manage your enterprise brand identity, target customer tier, and primary intake objectives."
+        subtitle="Manage your enterprise brand identity, target customer tier, and primary intake objectives."
+        icon={<Building2 className="h-5 w-5" />}
         badge={
-          savedNotice && (
-            <span className="px-2.5 py-0.5 text-xs font-mono font-semibold rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 flex items-center gap-1 animate-pulse">
-              <Check className="h-3 w-3" />
+          savedNotice ? (
+            <span className="px-3 py-1 text-xs font-semibold rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5 animate-pulse">
+              <Check className="h-3.5 w-3.5" />
               Auto-saved
             </span>
-          )
+          ) : undefined
         }
       />
 
-      <SectionCard>
+      <div className="rounded-3xl border border-border/70 bg-card p-6 shadow-xs">
         <BusinessProfileForm onSavedNotice={triggerSaveNotice} />
-      </SectionCard>
-    </div>
+      </div>
+    </AppPage>
   )
 }

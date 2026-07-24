@@ -2,23 +2,25 @@
 
 import * as React from "react"
 import Image from "next/image"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/context/auth-context"
+import { useWorkspace } from "@/context/workspace-context"
 import { currentUser } from "@/mock/dashboard-data"
 import {
   User,
   Settings,
-  ShieldCheck,
   CreditCard,
   LogOut,
   ChevronDown,
   Sparkles,
-  Command,
+  RotateCcw,
 } from "lucide-react"
 
 export function UserProfileDropdown() {
   const router = useRouter()
   const { logout } = useAuth()
+  const { resetWorkspace } = useWorkspace()
   const [open, setOpen] = React.useState(false)
   const dropdownRef = React.useRef<HTMLDivElement>(null)
 
@@ -34,12 +36,14 @@ export function UserProfileDropdown() {
 
   const handleSignOut = () => {
     setOpen(false)
+    resetWorkspace() // Resets multi-step workspace configurations & clears localStorage
     logout()
     router.push("/login")
   }
 
   return (
     <div className="relative" ref={dropdownRef}>
+      {/* Clickable Profile Trigger */}
       <button
         type="button"
         onClick={() => setOpen(!open)}
@@ -63,6 +67,7 @@ export function UserProfileDropdown() {
         <ChevronDown className="h-4 w-4 text-muted-foreground hidden sm:block" />
       </button>
 
+      {/* Popover Menu */}
       {open && (
         <div className="absolute right-0 mt-2 w-72 rounded-2xl border border-border bg-popover p-2 text-popover-foreground shadow-2xl z-50 animate-in fade-in-50 zoom-in-95 space-y-1">
           {/* User Details Header */}
@@ -81,7 +86,7 @@ export function UserProfileDropdown() {
               <span className="text-xs text-muted-foreground truncate">
                 {currentUser.email}
               </span>
-              <span className="text-[10px] font-semibold text-primary mt-0.5">
+              <span className="text-xs font-semibold text-primary mt-0.5">
                 {currentUser.role}
               </span>
             </div>
@@ -89,23 +94,23 @@ export function UserProfileDropdown() {
 
           {/* Actions List */}
           <div className="space-y-0.5 pt-1">
-            <a
-              href="#settings"
+            <Link
+              href="/users"
               onClick={() => setOpen(false)}
               className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-foreground hover:bg-muted/70 transition-colors"
             >
               <User className="h-4 w-4 text-muted-foreground" />
-              <span>Profile Settings</span>
-            </a>
+              <span>Profile & Team Access</span>
+            </Link>
 
-            <a
-              href="#workspace-settings"
+            <Link
+              href="/settings"
               onClick={() => setOpen(false)}
               className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-foreground hover:bg-muted/70 transition-colors"
             >
               <Settings className="h-4 w-4 text-muted-foreground" />
               <span>Workspace Preferences</span>
-            </a>
+            </Link>
 
             <a
               href="#billing"
@@ -116,7 +121,7 @@ export function UserProfileDropdown() {
                 <CreditCard className="h-4 w-4 text-muted-foreground" />
                 <span>Plan & Billing</span>
               </div>
-              <span className="text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-1.5 py-0.5 rounded-full">
+              <span className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-1.5 py-0.5 rounded-full">
                 {currentUser.plan}
               </span>
             </a>
@@ -124,13 +129,14 @@ export function UserProfileDropdown() {
 
           <div className="h-[1px] bg-border/60 my-1" />
 
+          {/* Reset & Logout Action Button */}
           <button
             type="button"
             onClick={handleSignOut}
-            className="flex w-full cursor-pointer items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-rose-500 hover:bg-rose-500/10 transition-colors text-left"
+            className="flex w-full cursor-pointer items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold text-rose-500 hover:bg-rose-500/10 transition-colors text-left"
           >
             <LogOut className="h-4 w-4" />
-            <span>Sign Out</span>
+            <span>Sign Out & Reset Setup</span>
           </button>
         </div>
       )}

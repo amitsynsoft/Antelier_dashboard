@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
 import { useWorkspace } from "@/context/workspace-context"
 import { BusinessProfileForm } from "@/components/forms/business-profile-form"
@@ -48,11 +49,11 @@ export default function WorkspaceSetupPage() {
   }
 
   const steps = [
-    { number: 1, title: "Business Profile", short: "Profile", icon: Building2 },
-    { number: 2, title: "Knowledge Base", short: "Knowledge", icon: FileText },
-    { number: 3, title: "AI Assistant", short: "AI Agent", icon: Bot },
-    { number: 4, title: "Integrations", short: "Integrations", icon: Grid },
-    { number: 5, title: "Finish", short: "Finish", icon: CheckCircle2 }
+    { number: 1, title: "Business Profile", icon: Building2 },
+    { number: 2, title: "Knowledge Base", icon: FileText },
+    { number: 3, title: "AI Assistant", icon: Bot },
+    { number: 4, title: "Integrations", icon: Grid },
+    { number: 5, title: "Finish", icon: CheckCircle2 }
   ]
 
   const nextStep = () => {
@@ -100,7 +101,7 @@ export default function WorkspaceSetupPage() {
 
           <div className="flex items-center gap-3">
             {savedMessage && (
-              <span className="text-xs font-mono font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20 flex items-center gap-1.5 animate-pulse">
+              <span className="text-xs font-mono font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20 flex items-center gap-1.5">
                 <Check className="h-3.5 w-3.5" />
                 {savedMessage}
               </span>
@@ -142,8 +143,8 @@ export default function WorkspaceSetupPage() {
             />
           </div>
 
-          {/* Step Buttons Row */}
-          <div className="grid grid-cols-5 gap-1.5 sm:gap-3 pt-2">
+          {/* Expandable Step Buttons Row (No vertical slide animation) */}
+          <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto no-scrollbar py-1">
             {steps.map((step) => {
               const isActive = state.currentStep === step.number
               const isCompleted = state.currentStep > step.number
@@ -153,91 +154,100 @@ export default function WorkspaceSetupPage() {
                   key={step.number}
                   type="button"
                   onClick={() => setCurrentStep(step.number)}
-                  className={`flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-1.5 sm:gap-2.5 p-2 sm:px-3.5 sm:py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer border ${
+                  className={`flex items-center gap-2.5 px-4 py-2.5 rounded-2xl text-xs font-semibold transition-all cursor-pointer border shrink-0 ${
                     isActive
-                      ? "bg-primary/10 text-primary border-primary/40 ring-1 ring-primary/30 shadow-2xs"
+                      ? "bg-primary/15 text-primary border-primary/40 ring-2 ring-primary/20 shadow-2xs font-extrabold flex-1 justify-center"
                       : isCompleted
-                      ? "bg-muted/40 text-foreground border-border/50 hover:bg-muted"
-                      : "bg-background text-muted-foreground/70 border-border/30 hover:text-foreground"
+                      ? "bg-emerald-500/10 text-foreground border-emerald-500/30 hover:bg-emerald-500/20"
+                      : "bg-background text-muted-foreground border-border/40 hover:text-foreground"
                   }`}
                 >
                   <div
-                    className={`flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-lg text-xs font-mono font-bold shrink-0 transition-colors ${
+                    className={`flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-xl text-xs font-mono font-bold shrink-0 transition-colors ${
                       isActive
                         ? "bg-primary text-primary-foreground"
                         : isCompleted
-                        ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400"
+                        ? "bg-emerald-500 text-white"
                         : "bg-muted text-muted-foreground"
                     }`}
                   >
                     {isCompleted ? <Check className="h-3.5 w-3.5" /> : step.number}
                   </div>
-                  <span className="hidden sm:inline truncate">{step.title}</span>
-                  <span className="sm:hidden text-[10px] truncate">{step.short}</span>
+                  <span className="whitespace-nowrap font-bold">
+                    {step.title}
+                  </span>
                 </button>
               )
             })}
           </div>
         </div>
 
-        {/* Elevated Form Content Card */}
+        {/* Form Content Card (Pure opacity transition, zero vertical movement) */}
         <div className="bg-card border border-border/80 rounded-2xl p-6 sm:p-8 shadow-xl space-y-6">
-          {state.currentStep === 1 && (
-            <BusinessProfileForm onSavedNotice={handleSavedNotice} showTitle />
-          )}
-          {state.currentStep === 2 && (
-            <KnowledgeBaseForm onSavedNotice={handleSavedNotice} showTitle />
-          )}
-          {state.currentStep === 3 && (
-            <AiAssistantForm onSavedNotice={handleSavedNotice} showTitle />
-          )}
-          {state.currentStep === 4 && (
-            <IntegrationsForm onSavedNotice={handleSavedNotice} showTitle />
-          )}
-          {state.currentStep === 5 && (
-            <div className="space-y-6 text-center py-6">
-              <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-500 ring-2 ring-emerald-500/20 shadow-inner mx-auto">
-                <ShieldCheck className="h-8 w-8" />
-              </div>
+          <motion.div
+            key={state.currentStep}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.15 }}
+            className="w-full"
+          >
+            {state.currentStep === 1 && (
+              <BusinessProfileForm onSavedNotice={handleSavedNotice} showTitle />
+            )}
+            {state.currentStep === 2 && (
+              <KnowledgeBaseForm onSavedNotice={handleSavedNotice} showTitle />
+            )}
+            {state.currentStep === 3 && (
+              <AiAssistantForm onSavedNotice={handleSavedNotice} showTitle />
+            )}
+            {state.currentStep === 4 && (
+              <IntegrationsForm onSavedNotice={handleSavedNotice} showTitle />
+            )}
+            {state.currentStep === 5 && (
+              <div className="space-y-6 text-center py-6">
+                <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-500 ring-2 ring-emerald-500/20 shadow-inner mx-auto">
+                  <ShieldCheck className="h-8 w-8" />
+                </div>
 
-              <div className="space-y-2">
-                <h2 className="text-2xl sm:text-3xl font-serif font-bold tracking-tight text-foreground">
-                  Setup Complete ({completionPercentage}%)
-                </h2>
-                <p className="text-xs sm:text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
-                  Your AI Client Intake platform is now configured. Your AI agents are vectorized and ready to qualify prospective clients.
-                </p>
-              </div>
+                <div className="space-y-2">
+                  <h2 className="text-2xl sm:text-3xl font-serif font-bold tracking-tight text-foreground">
+                    Setup Complete ({completionPercentage}%)
+                  </h2>
+                  <p className="text-xs sm:text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
+                    Your AI Client Intake platform is now configured. Your AI agents are vectorized and ready to qualify prospective clients.
+                  </p>
+                </div>
 
-              {/* Summary Cards Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-left pt-4 max-w-2xl mx-auto">
-                <div className="p-3.5 rounded-xl border border-border/60 bg-muted/20">
-                  <span className="text-xs uppercase font-mono text-muted-foreground font-bold tracking-wider">Org Name</span>
-                  <div className="text-sm font-bold text-foreground truncate mt-0.5">
-                    {state.businessProfile.companyName}
+                {/* Summary Cards Grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-left pt-4 max-w-2xl mx-auto">
+                  <div className="p-3.5 rounded-xl border border-border/60 bg-muted/20">
+                    <span className="text-xs uppercase font-mono text-muted-foreground font-bold tracking-wider">Org Name</span>
+                    <div className="text-sm font-bold text-foreground truncate mt-0.5">
+                      {state.businessProfile.companyName}
+                    </div>
                   </div>
-                </div>
-                <div className="p-3.5 rounded-xl border border-border/60 bg-muted/20">
-                  <span className="text-xs uppercase font-mono text-muted-foreground font-bold tracking-wider">Knowledge Base</span>
-                  <div className="text-sm font-bold text-foreground truncate mt-0.5">
-                    {state.knowledgeBase.uploadedFiles.length + state.knowledgeBase.scrapeUrls.length} Sources
+                  <div className="p-3.5 rounded-xl border border-border/60 bg-muted/20">
+                    <span className="text-xs uppercase font-mono text-muted-foreground font-bold tracking-wider">Knowledge Base</span>
+                    <div className="text-sm font-bold text-foreground truncate mt-0.5">
+                      {state.knowledgeBase.uploadedFiles.length + state.knowledgeBase.scrapeUrls.length} Sources
+                    </div>
                   </div>
-                </div>
-                <div className="p-3.5 rounded-xl border border-border/60 bg-muted/20">
-                  <span className="text-xs uppercase font-mono text-muted-foreground font-bold tracking-wider">AI Model</span>
-                  <div className="text-sm font-bold text-foreground truncate mt-0.5">
-                    {state.aiAssistant.primaryModel}
+                  <div className="p-3.5 rounded-xl border border-border/60 bg-muted/20">
+                    <span className="text-xs uppercase font-mono text-muted-foreground font-bold tracking-wider">AI Model</span>
+                    <div className="text-sm font-bold text-foreground truncate mt-0.5">
+                      {state.aiAssistant.primaryModel}
+                    </div>
                   </div>
-                </div>
-                <div className="p-3.5 rounded-xl border border-border/60 bg-muted/20">
-                  <span className="text-xs uppercase font-mono text-muted-foreground font-bold tracking-wider">Connectors</span>
-                  <div className="text-sm font-bold text-foreground truncate mt-0.5">
-                    {state.integrations.salesforce ? "Salesforce " : ""}{state.integrations.slack ? "+ Slack" : ""}
+                  <div className="p-3.5 rounded-xl border border-border/60 bg-muted/20">
+                    <span className="text-xs uppercase font-mono text-muted-foreground font-bold tracking-wider">Connectors</span>
+                    <div className="text-sm font-bold text-foreground truncate mt-0.5">
+                      {state.integrations.salesforce ? "Salesforce " : ""}{state.integrations.slack ? "+ Slack" : ""}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
+          </motion.div>
 
           {/* Embedded Step Action Bar */}
           <div className="pt-6 border-t border-border/60 flex items-center justify-between gap-3">
