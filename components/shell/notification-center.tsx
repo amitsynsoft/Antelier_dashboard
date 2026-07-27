@@ -170,16 +170,6 @@ export function NotificationCenter() {
               ))
             )}
           </div>
-
-          <div className="p-2.5 border-t border-border/50 bg-muted/20 text-center">
-            <a
-              href="#activity"
-              onClick={() => setOpen(false)}
-              className="text-sm font-semibold text-primary hover:underline"
-            >
-              View complete activity audit trail →
-            </a>
-          </div>
         </div>
       )}
     </div>

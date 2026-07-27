@@ -57,6 +57,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = () => {
     setIsAuthenticated(false)
+    setIsFirstLogin(false)
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.removeItem(AUTH_STORAGE_KEY)
+        localStorage.removeItem("antelier_workspace_state_v1")
+      } catch (e) {
+        console.error("Error clearing storage on logout", e)
+      }
+    }
   }
 
   const setFirstLoginState = (val: boolean) => {

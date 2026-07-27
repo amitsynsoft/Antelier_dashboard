@@ -1,27 +1,28 @@
 "use client"
 
 import * as React from "react"
+import { notify } from "@/lib/toast"
 import { AppShell } from "@/components/shell/app-shell"
 import { AppPage } from "@/components/layout/app-page"
 import { WelcomeHeader } from "@/features/dashboard/welcome-header"
 import { WorkspaceCompletionCard } from "@/features/dashboard/workspace-completion-card"
-import { KpiGrid } from "@/features/dashboard/kpi-grid"
-import { QuickActionsGrid } from "@/features/dashboard/quick-actions-grid"
-import { AiAssistantOverviewCard } from "@/features/dashboard/ai-assistant-overview-card"
-import { IntegrationsListCard } from "@/features/dashboard/integrations-list-card"
-import { KnowledgeBaseChartCard } from "@/features/dashboard/knowledge-base-chart-card"
-import { PromptStudioSummaryCard } from "@/features/dashboard/prompt-studio-summary-card"
-import { RecentActivityFeed } from "@/features/dashboard/recent-activity-feed"
-import { BottomTestBanner } from "@/features/dashboard/bottom-test-banner"
 
-// Settings Sub-views
+// Intake Operational Analytics Feature Suite
+import {
+  IntakeOverviewCards,
+  IntakeTrendChart,
+  IntakeSourceBreakdown,
+  IntentCategoriesCard,
+  RecentIntakesTable,
+} from "@/features/dashboard/intake-analytics"
+
+// Settings Sub-views for Hash Navigation
 import { BusinessProfileView } from "@/features/settings/business-profile-view"
 import { KnowledgeBaseView } from "@/features/settings/knowledge-base-view"
 import { AiAssistantView } from "@/features/settings/ai-assistant-view"
 import { IntegrationsView } from "@/features/settings/integrations-view"
 
 export default function DashboardPage() {
-  const [toastMessage, setToastMessage] = React.useState<string | null>(null)
   const [currentHash, setCurrentHash] = React.useState<string>("")
 
   React.useEffect(() => {
@@ -32,11 +33,6 @@ export default function DashboardPage() {
     window.addEventListener("hashchange", handleHashChange)
     return () => window.removeEventListener("hashchange", handleHashChange)
   }, [])
-
-  const triggerToast = (msg: string) => {
-    setToastMessage(msg)
-    setTimeout(() => setToastMessage(null), 4000)
-  }
 
   const renderContent = () => {
     if (currentHash === "#business-profile") {
@@ -76,56 +72,37 @@ export default function DashboardPage() {
         {/* Welcome Header */}
         <WelcomeHeader
           onTestAi={() =>
-            triggerToast("Opening AI Assistant test environment...")
+            notify.info("Opening AI Assistant simulator environment...", {
+              description:
+                "Interactive voice and chat testing panel launching.",
+            })
           }
         />
 
-        {/* Row 1: Workspace Configuration Card (92% Complete) */}
+        {/* Section 1: Hero Section (Conditional: Only visible when workspace setup < 100%) */}
         <WorkspaceCompletionCard />
 
-        {/* Row 2: 5 High-Impact KPI Metric Cards */}
-        <KpiGrid />
+        {/* Section 2: Intake Overview Touchpoint Cards */}
+        <IntakeOverviewCards />
 
-        {/* Row 3: 3-Column Grid (Quick Actions, AI Assistant Overview, Integrations) */}
-        <div className="grid grid-cols-1 items-stretch gap-6 md:grid-cols-2">
-          {/* <QuickActionsGrid /> */}
-          <AiAssistantOverviewCard />
-          <IntegrationsListCard />
+        {/* Section 3: Intake Trend Chart & Source Breakdown */}
+        <div className="grid grid-cols-1 items-stretch gap-6 lg:grid-cols-3">
+          <div className="lg:col-span-2">
+            <IntakeTrendChart />
+          </div>
+          <div className="lg:col-span-1">
+            <IntakeSourceBreakdown />
+          </div>
         </div>
 
-        {/* Row 4: 3-Column Grid (Knowledge Base Chart, Prompt Studio Summary, Recent Activity) */}
-        <div className="grid grid-cols-1 items-stretch gap-6 md:grid-cols-2 lg:grid-cols-3">
-          <KnowledgeBaseChartCard />
-          <PromptStudioSummaryCard />
-          <RecentActivityFeed />
-        </div>
+        {/* Section 4: Intent Categories Classification */}
+        {/* <IntentCategoriesCard /> */}
 
-        {/* Row 5: Bottom AI Test Banner */}
-        <BottomTestBanner
-          onTestAi={() => triggerToast("Launching AI Assistant simulator...")}
-        />
+        {/* Section 5: Recent Intakes Live Operational Log Table */}
+        <RecentIntakesTable />
       </AppPage>
     )
   }
 
-  return (
-    <AppShell>
-      {/* Toast Notification Banner */}
-      {toastMessage && (
-        <div className="fixed right-6 bottom-6 z-50 flex animate-in items-center gap-3 rounded-xl border border-primary/30 bg-popover px-4.5 py-3 text-foreground shadow-2xl slide-in-from-bottom-5">
-          <div className="h-2.5 w-2.5 animate-ping rounded-full bg-emerald-500" />
-          <span className="text-sm font-semibold">{toastMessage}</span>
-          <button
-            type="button"
-            onClick={() => setToastMessage(null)}
-            className="ml-2 cursor-pointer text-sm font-bold text-muted-foreground hover:text-foreground"
-          >
-            ✕
-          </button>
-        </div>
-      )}
-
-      {renderContent()}
-    </AppShell>
-  )
+  return <AppShell>{renderContent()}</AppShell>
 }

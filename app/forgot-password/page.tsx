@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
+import { toast } from "sonner"
 import { Sparkles, ArrowLeft, Mail, CheckCircle2 } from "lucide-react"
 
 export default function ForgotPasswordPage() {
@@ -12,6 +13,9 @@ export default function ForgotPasswordPage() {
     e.preventDefault()
     if (email) {
       setSubmitted(true)
+      toast.success("Password reset email sent!", {
+        description: `Instructions dispatched to ${email}`,
+      })
     }
   }
 
@@ -28,8 +32,8 @@ export default function ForgotPasswordPage() {
           <h1 className="text-2xl font-bold tracking-tight text-foreground">
             Reset Your Password
           </h1>
-          <p className="text-xs sm:text-sm text-muted-foreground">
-            Enter your enterprise email address and we'll send you instructions to reset your password.
+          <p className="text-sm text-muted-foreground">
+            Enter your enterprise email address and we&apos;ll send you instructions to reset your password.
           </p>
         </div>
 
@@ -51,23 +55,23 @@ export default function ForgotPasswordPage() {
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-foreground">Work Email Address</label>
+              <label className="text-sm font-semibold text-foreground">Work Email Address</label>
               <div className="relative flex items-center">
-                <Mail className="absolute left-3 h-4 w-4 text-muted-foreground pointer-events-none" />
+                <Mail className="absolute left-3.5 h-4 w-4 text-muted-foreground pointer-events-none" />
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@company.com"
-                  className="w-full h-10 pl-9 pr-3 text-xs bg-muted/30 border border-input rounded-xl text-foreground focus:ring-2 focus:ring-ring focus:outline-none"
+                  className="w-full h-11 pl-10 pr-3.5 text-sm bg-muted/30 border border-input rounded-xl text-foreground focus:ring-2 focus:ring-ring focus:outline-none"
                 />
               </div>
             </div>
 
             <button
               type="submit"
-              className="w-full h-10 text-xs font-bold rounded-xl bg-primary text-primary-foreground hover:opacity-90 transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+              className="w-full h-11 text-sm font-bold rounded-xl bg-primary text-primary-foreground hover:opacity-90 transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer"
             >
               <span>Send Reset Instructions</span>
             </button>

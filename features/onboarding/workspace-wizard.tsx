@@ -20,13 +20,15 @@ import {
   ShieldCheck,
   Zap,
   Check,
+  FastForward,
+  AlertCircle
 } from "lucide-react"
 
 export function WorkspaceWizard() {
   const {
     state,
     setCurrentStep,
-    skipWizard,
+    skipStep,
     completeWizard,
     closeWizard,
     completionPercentage
@@ -63,6 +65,13 @@ export function WorkspaceWizard() {
     }
   }
 
+  const handleSkipStep = () => {
+    skipStep(state.currentStep)
+    if (state.currentStep < 5) {
+      setCurrentStep(state.currentStep + 1)
+    }
+  }
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-background/80 backdrop-blur-md">
       {/* Container */}
@@ -78,7 +87,7 @@ export function WorkspaceWizard() {
                 AntelierHub Workspace Setup Wizard
               </h2>
               <p className="text-xs text-muted-foreground">
-                Configure essential AI client intake parameters before live deployment.
+                Configure essential AI client intake parameters or skip individual steps to set up later.
               </p>
             </div>
           </div>
@@ -91,54 +100,60 @@ export function WorkspaceWizard() {
             )}
             <button
               type="button"
-              onClick={skipWizard}
-              className="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors px-2 py-1 cursor-pointer"
-            >
-              Skip for now
-            </button>
-            <button
-              type="button"
               onClick={closeWizard}
-              className="p-1 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+              className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors cursor-pointer border border-border/40"
+              title="Close Wizard"
             >
               <X className="h-4 w-4" />
             </button>
           </div>
         </div>
 
-        {/* Expandable Stepper Navigation (Clean horizontal transition, no vertical slide) */}
-        <div className="px-6 py-3.5 border-b border-border/40 bg-card overflow-x-auto no-scrollbar">
-          <div className="flex items-center gap-2 sm:gap-3 min-w-full">
+        {/* Stepper Navigation */}
+        <div className="px-4 sm:px-6 py-3 border-b border-border/40 bg-card">
+          <div className="flex items-center justify-between gap-1.5 sm:gap-2.5 w-full">
             {steps.map((step) => {
               const isActive = state.currentStep === step.number
-              const isCompleted = state.currentStep > step.number
+              const isSkipped = state.skippedSteps.includes(step.number)
+              const isCompleted = state.currentStep > step.number && !isSkipped
 
               return (
                 <button
                   key={step.number}
                   type="button"
                   onClick={() => setCurrentStep(step.number)}
-                  className={`flex items-center gap-2.5 px-3.5 py-2 rounded-full text-xs font-semibold transition-all cursor-pointer border shrink-0 ${
+                  title={`${step.title}${isSkipped ? " (Skipped)" : isCompleted ? " (Completed)" : ""}`}
+                  className={`flex items-center gap-1.5 sm:gap-2 rounded-full text-xs transition-all cursor-pointer border ${
                     isActive
-                      ? "bg-primary/15 text-primary border-primary/40 ring-2 ring-primary/20 shadow-2xs font-extrabold flex-1 justify-center"
+                      ? "bg-primary/15 text-primary border-primary/40 ring-2 ring-primary/20 shadow-2xs font-extrabold flex-1 justify-center px-3.5 py-2"
                       : isCompleted
-                      ? "bg-emerald-500/10 text-foreground border-emerald-500/30 hover:bg-emerald-500/20"
-                      : "bg-background text-muted-foreground border-border/50 hover:bg-muted hover:text-foreground"
+                      ? "bg-emerald-500/10 text-foreground border-emerald-500/30 hover:bg-emerald-500/20 px-2 sm:px-2.5 py-1.5 font-semibold"
+                      : isSkipped
+                      ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30 hover:bg-amber-500/20 px-2 sm:px-2.5 py-1.5 font-semibold"
+                      : "bg-background text-muted-foreground border-border/50 hover:bg-muted hover:text-foreground px-2 sm:px-2.5 py-1.5 font-medium"
                   }`}
                 >
                   <div
-                    className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-mono font-bold shrink-0 transition-colors ${
+                    className={`flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-full text-[11px] font-mono font-bold shrink-0 transition-colors ${
                       isActive
                         ? "bg-primary text-primary-foreground"
                         : isCompleted
                         ? "bg-emerald-500 text-white"
+                        : isSkipped
+                        ? "bg-amber-500 text-white"
                         : "bg-muted text-muted-foreground"
                     }`}
                   >
-                    {isCompleted ? <Check className="h-3.5 w-3.5" /> : step.number}
+                    {isCompleted ? (
+                      <Check className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                    ) : isSkipped ? (
+                      <FastForward className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                    ) : (
+                      step.number
+                    )}
                   </div>
 
-                  <span className="whitespace-nowrap font-bold">
+                  <span className={`whitespace-nowrap ${isActive ? "font-bold" : "hidden sm:inline font-semibold text-[11px] max-w-[110px] truncate"}`}>
                     {step.title}
                   </span>
                 </button>
@@ -147,7 +162,7 @@ export function WorkspaceWizard() {
           </div>
         </div>
 
-        {/* Step Content Area (Fade-only transition, zero top-to-bottom or bottom-to-top vertical movement) */}
+        {/* Step Content Area */}
         <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-6">
           <motion.div
             key={state.currentStep}
@@ -176,37 +191,65 @@ export function WorkspaceWizard() {
 
                 <div className="space-y-2">
                   <h3 className="text-2xl font-bold tracking-tight text-foreground">
-                    Workspace Readiness Score: {completionPercentage}%
+                    Workspace Setup Overview
                   </h3>
                   <p className="text-xs sm:text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
-                    Your AI Client Intake platform is operational. Agents are vectorized and ready to qualify incoming leads.
+                    Review your workspace configuration status. Any skipped steps can be completed anytime from your dashboard.
                   </p>
                 </div>
 
                 {/* Progress Summary Cards */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-left pt-4 max-w-2xl mx-auto">
                   <div className="p-3 rounded-xl border border-border/60 bg-muted/20">
-                    <span className="text-xs uppercase font-mono font-bold text-muted-foreground tracking-wider">Org Name</span>
+                    <span className="text-xs uppercase font-mono font-bold text-muted-foreground tracking-wider">Business Profile</span>
                     <div className="text-sm font-bold text-foreground truncate mt-0.5">
-                      {state.businessProfile.companyName}
+                      {state.skippedSteps.includes(1) ? (
+                        <span className="text-amber-600 dark:text-amber-400 font-medium">Skipped</span>
+                      ) : state.businessProfile.companyName ? (
+                        state.businessProfile.companyName
+                      ) : (
+                        <span className="text-muted-foreground">Not Configured</span>
+                      )}
                     </div>
                   </div>
                   <div className="p-3 rounded-xl border border-border/60 bg-muted/20">
                     <span className="text-xs uppercase font-mono font-bold text-muted-foreground tracking-wider">Knowledge Base</span>
                     <div className="text-sm font-bold text-foreground truncate mt-0.5">
-                      {state.knowledgeBase.uploadedFiles.length + state.knowledgeBase.scrapeUrls.length} Sources
+                      {state.skippedSteps.includes(2) ? (
+                        <span className="text-amber-600 dark:text-amber-400 font-medium">Skipped</span>
+                      ) : (state.knowledgeBase.uploadedFiles.length + state.knowledgeBase.scrapeUrls.length) > 0 ? (
+                        `${state.knowledgeBase.uploadedFiles.length + state.knowledgeBase.scrapeUrls.length} Sources`
+                      ) : (
+                        <span className="text-muted-foreground">Not Configured</span>
+                      )}
                     </div>
                   </div>
                   <div className="p-3 rounded-xl border border-border/60 bg-muted/20">
                     <span className="text-xs uppercase font-mono font-bold text-muted-foreground tracking-wider">AI Model</span>
                     <div className="text-sm font-bold text-foreground truncate mt-0.5">
-                      {state.aiAssistant.primaryModel}
+                      {state.skippedSteps.includes(3) ? (
+                        <span className="text-amber-600 dark:text-amber-400 font-medium">Skipped</span>
+                      ) : state.aiAssistant.agentName ? (
+                        state.aiAssistant.primaryModel
+                      ) : (
+                        <span className="text-muted-foreground">Not Configured</span>
+                      )}
                     </div>
                   </div>
                   <div className="p-3 rounded-xl border border-border/60 bg-muted/20">
                     <span className="text-xs uppercase font-mono font-bold text-muted-foreground tracking-wider">Connectors</span>
                     <div className="text-sm font-bold text-foreground truncate mt-0.5">
-                      {state.integrations.salesforce ? "Salesforce " : ""}{state.integrations.slack ? "+ Slack" : ""}
+                      {state.skippedSteps.includes(4) ? (
+                        <span className="text-amber-600 dark:text-amber-400 font-medium">Skipped</span>
+                      ) : (
+                        state.integrations.hubspot ||
+                        Boolean(typeof state.integrations.webhookUrl === "string" && state.integrations.webhookUrl.trim()) ||
+                        Boolean(state.integrations.connectedMap && Object.values(state.integrations.connectedMap).some(Boolean))
+                      ) ? (
+                        "Connected"
+                      ) : (
+                        <span className="text-muted-foreground">Not Configured</span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -231,6 +274,18 @@ export function WorkspaceWizard() {
             <span className="text-xs text-muted-foreground font-mono hidden sm:inline">
               Step {state.currentStep} of 5
             </span>
+
+            {state.currentStep < 5 && (
+              <button
+                type="button"
+                onClick={handleSkipStep}
+                className="flex items-center gap-1.5 px-4 py-2.5 text-xs font-bold rounded-xl border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 transition-colors cursor-pointer"
+              >
+                <span>Skip Step</span>
+                <FastForward className="h-3.5 w-3.5" />
+              </button>
+            )}
+
             {state.currentStep < 5 ? (
               <button
                 type="button"
@@ -247,7 +302,7 @@ export function WorkspaceWizard() {
                 className="flex items-center gap-1.5 px-5 py-2.5 text-xs font-bold rounded-xl bg-emerald-600 text-white hover:bg-emerald-500 transition-all shadow-md cursor-pointer"
               >
                 <Zap className="h-4 w-4" />
-                <span>Complete & Launch Dashboard</span>
+                <span>Complete & Open Dashboard</span>
               </button>
             )}
           </div>

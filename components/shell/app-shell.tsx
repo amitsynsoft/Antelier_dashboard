@@ -11,10 +11,36 @@ interface AppShellProps {
 }
 
 export function AppShell({ children }: AppShellProps) {
-  const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false)
+  // Persist collapsed state across page transitions via localStorage
+  const [sidebarCollapsed, setSidebarCollapsed] = React.useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const saved = localStorage.getItem("antelier_sidebar_collapsed")
+        return saved !== null ? JSON.parse(saved) : false
+      } catch {
+        return false
+      }
+    }
+    return false
+  })
+
   const [mobileNavOpen, setMobileNavOpen] = React.useState(false)
   const [commandPaletteOpen, setCommandPaletteOpen] = React.useState(false)
   const [toastMessage, setToastMessage] = React.useState<string | null>(null)
+
+  const toggleSidebar = React.useCallback(() => {
+    setSidebarCollapsed((prev) => {
+      const next = !prev
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem("antelier_sidebar_collapsed", JSON.stringify(next))
+        } catch {
+          // ignore storage quota errors
+        }
+      }
+      return next
+    })
+  }, [])
 
   const triggerToast = (msg: string) => {
     setToastMessage(msg)
@@ -22,16 +48,16 @@ export function AppShell({ children }: AppShellProps) {
   }
 
   return (
-    <div className="flex h-screen w-full bg-background font-sans overflow-hidden">
+    <div className="flex h-screen w-full overflow-hidden bg-background font-sans">
       {/* Toast Notification Banner */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4.5 py-3 rounded-xl border border-primary/30 bg-popover text-foreground shadow-2xl animate-in slide-in-from-bottom-5">
-          <div className="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-ping" />
+        <div className="animate-in slide-in-from-bottom-5 z-50 fixed bottom-6 right-6 flex items-center gap-3 rounded-xl border border-primary/30 bg-popover px-4.5 py-3 text-foreground shadow-2xl">
+          <div className="h-2.5 w-2.5 animate-ping rounded-full bg-emerald-500" />
           <span className="text-sm font-semibold">{toastMessage}</span>
           <button
             type="button"
             onClick={() => setToastMessage(null)}
-            className="text-sm text-muted-foreground hover:text-foreground ml-2 font-bold cursor-pointer"
+            className="ml-2 cursor-pointer text-sm font-bold text-muted-foreground hover:text-foreground"
           >
             ✕
           </button>
@@ -41,8 +67,10 @@ export function AppShell({ children }: AppShellProps) {
       {/* Desktop Sidebar */}
       <Sidebar
         collapsed={sidebarCollapsed}
-        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
-        onTriggerDemo={() => triggerToast("Launching live client intake simulation demo...")}
+        onToggleCollapse={toggleSidebar}
+        onTriggerDemo={() =>
+          triggerToast("Launching live client intake simulation demo...")
+        }
         className="hidden lg:flex"
       />
 
@@ -63,10 +91,12 @@ export function AppShell({ children }: AppShellProps) {
         <TopNav
           onOpenMobileNav={() => setMobileNavOpen(true)}
           onOpenCommandPalette={() => setCommandPaletteOpen(true)}
-          onTriggerDemo={() => triggerToast("Launching product tour and interactive demos...")}
+          onTriggerDemo={() =>
+            triggerToast("Launching product tour and interactive demos...")
+          }
         />
 
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6">
+        <main className="flex-1 space-y-6 overflow-y-auto p-4 sm:p-6 lg:p-8">
           {children}
         </main>
       </div>

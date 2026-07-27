@@ -1,172 +1,194 @@
 "use client"
 
 import * as React from "react"
+import Image from "next/image"
 import { useWorkspace } from "@/context/workspace-context"
-import { Grid, Database, Megaphone, MessageSquare, Code, HardDrive, Check, Zap } from "lucide-react"
+import { INTEGRATIONS_CATALOG, IntegrationDefinition } from "@/features/integrations/data/integrations-data"
+import { OAuthModal } from "@/features/integrations/components/oauth-modal"
+import { IntegrationLogsModal } from "@/features/integrations/components/integration-logs-modal"
+import {
+  Grid,
+  Plug,
+  Sliders,
+} from "lucide-react"
 
 interface IntegrationsFormProps {
   onSavedNotice?: () => void
   showTitle?: boolean
 }
 
-export function IntegrationsForm({ onSavedNotice, showTitle = false }: IntegrationsFormProps) {
-  const { state, updateIntegrations } = useWorkspace()
-  const data = state.integrations
+export function IntegrationsForm({
+  onSavedNotice,
+  showTitle = false,
+}: IntegrationsFormProps) {
+  const {
+    isIntegrationConnected,
+    getIntegrationAccount,
+    disconnectIntegration
+  } = useWorkspace()
 
-  const toggleIntegration = (key: keyof typeof data) => {
-    if (typeof data[key] === "boolean") {
-      updateIntegrations({ [key]: !data[key] })
-      onSavedNotice?.()
+  // Onboarding wizard strictly displays 4 key integrations
+  const wizardIntegrationIds = ["hubspot", "gmail", "whatsapp", "voice_agent"]
+  const wizardIntegrations = INTEGRATIONS_CATALOG.filter((item) =>
+    wizardIntegrationIds.includes(item.id)
+  )
+
+  const [selectedModalItem, setSelectedModalItem] = React.useState<IntegrationDefinition | null>(null)
+  const [modalStep, setModalStep] = React.useState<1 | 4 | 5>(1)
+  const [isModalOpen, setIsModalOpen] = React.useState(false)
+
+  const [selectedLogsItem, setSelectedLogsItem] = React.useState<IntegrationDefinition | null>(null)
+  const [isLogsOpen, setIsLogsOpen] = React.useState(false)
+
+  const openConnectModal = (item: IntegrationDefinition) => {
+    setSelectedModalItem(item)
+    setModalStep(1)
+    setIsModalOpen(true)
+    onSavedNotice?.()
+  }
+
+  const openConfigureModal = (item: IntegrationDefinition) => {
+    setSelectedModalItem(item)
+    setModalStep(4)
+    setIsModalOpen(true)
+    onSavedNotice?.()
+  }
+
+  const openLogsModal = (id: string) => {
+    const target = INTEGRATIONS_CATALOG.find((item) => item.id === id)
+    if (target) {
+      setSelectedLogsItem(target)
+      setIsLogsOpen(true)
     }
   }
 
   return (
     <div className="space-y-6">
       {showTitle && (
-        <div className="space-y-1 pb-4 border-b border-border/50">
-          <h2 className="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
+        <div className="space-y-1 border-b border-border/50 pb-4">
+          <h2 className="flex items-center gap-2 text-xl font-bold tracking-tight text-foreground">
             <Grid className="h-5 w-5 text-primary" />
-            Enterprise Integrations & Webhook Connectors
+            Workspace Core Connectors
           </h2>
-          <p className="text-xs text-muted-foreground">
-            Connect AntelierHub to your CRM, Slack workspace, and data warehouse for real-time lead routing.
+          <p className="text-sm text-muted-foreground">
+            Connect your primary CRM, email ingestion, messaging, and AI voice channels.
           </p>
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {/* Salesforce Toggle */}
-        <div className="p-4 rounded-xl border border-border/60 bg-muted/20 space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-lg bg-background border border-border/50 text-blue-500">
-                <Database className="h-4 w-4" />
-              </div>
-              <div>
-                <h4 className="text-xs font-bold text-foreground">Salesforce Enterprise CRM</h4>
-                <span className="text-[10px] text-muted-foreground">Bi-directional lead sync</span>
-              </div>
-            </div>
-            <input
-              type="checkbox"
-              checked={data.salesforce}
-              onChange={() => toggleIntegration("salesforce")}
-              className="h-4 w-4 rounded border-input text-primary focus:ring-primary"
-            />
-          </div>
+      {/* 4 Core Integration Cards */}
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+        {wizardIntegrations.map((item) => {
+          const isConnected = isIntegrationConnected(item.id)
+          const connectedAccount = getIntegrationAccount(item.id)
 
-          {data.salesforce && (
-            <div className="pt-2 border-t border-border/40 space-y-1">
-              <label className="text-[11px] font-mono text-muted-foreground">Salesforce Org ID</label>
-              <input
-                type="text"
-                value={data.salesforceOrgId || ""}
-                onChange={(e) => {
-                  updateIntegrations({ salesforceOrgId: e.target.value })
-                  onSavedNotice?.()
-                }}
-                className="w-full h-8 px-2.5 text-xs font-mono bg-background border border-input rounded-md text-foreground"
-              />
-            </div>
-          )}
-        </div>
+          return (
+            <div
+              key={item.id}
+              className={`p-5 rounded-2xl border transition-all flex flex-col justify-between space-y-4 bg-muted/20 ${
+                isConnected
+                  ? "border-emerald-500/40 bg-emerald-500/5 shadow-xs"
+                  : "border-border/60 hover:border-border"
+              }`}
+            >
+              <div className="space-y-3.5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="flex h-11 w-11 items-center justify-center rounded-xl border p-2 shrink-0 bg-background shadow-2xs"
+                      style={{ borderColor: `${item.brandColor}40` }}
+                    >
+                      <Image
+                        src={item.icon}
+                        alt={item.name}
+                        width={28}
+                        height={28}
+                        className="h-6 w-6 object-contain"
+                        unoptimized
+                      />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-bold text-foreground">{item.name}</h4>
+                      <span className="text-xs text-muted-foreground font-medium">{item.category}</span>
+                    </div>
+                  </div>
 
-        {/* HubSpot Toggle */}
-        <div className="p-4 rounded-xl border border-border/60 bg-muted/20 space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-lg bg-background border border-border/50 text-amber-500">
-                <Megaphone className="h-4 w-4" />
-              </div>
-              <div>
-                <h4 className="text-xs font-bold text-foreground">HubSpot Marketing Suite</h4>
-                <span className="text-[10px] text-muted-foreground">Campaign attribution & scoring</span>
-              </div>
-            </div>
-            <input
-              type="checkbox"
-              checked={data.hubspot}
-              onChange={() => toggleIntegration("hubspot")}
-              className="h-4 w-4 rounded border-input text-primary focus:ring-primary"
-            />
-          </div>
-        </div>
+                  <span
+                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold rounded-full border ${
+                      isConnected
+                        ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30"
+                        : "bg-muted text-muted-foreground border-border"
+                    }`}
+                  >
+                    {isConnected && <span className="h-2 w-2 rounded-full bg-emerald-500" />}
+                    {isConnected ? "Connected" : "Not Connected"}
+                  </span>
+                </div>
 
-        {/* Slack Toggle */}
-        <div className="p-4 rounded-xl border border-border/60 bg-muted/20 space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-lg bg-background border border-border/50 text-emerald-500">
-                <MessageSquare className="h-4 w-4" />
-              </div>
-              <div>
-                <h4 className="text-xs font-bold text-foreground">Slack Enterprise Grid</h4>
-                <span className="text-[10px] text-muted-foreground">Instant intake SLA alerts</span>
-              </div>
-            </div>
-            <input
-              type="checkbox"
-              checked={data.slack}
-              onChange={() => toggleIntegration("slack")}
-              className="h-4 w-4 rounded border-input text-primary focus:ring-primary"
-            />
-          </div>
+                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                  {item.shortDescription}
+                </p>
 
-          {data.slack && (
-            <div className="pt-2 border-t border-border/40 space-y-1">
-              <label className="text-[11px] font-mono text-muted-foreground">Alert Channel</label>
-              <input
-                type="text"
-                value={data.slackChannel || ""}
-                onChange={(e) => {
-                  updateIntegrations({ slackChannel: e.target.value })
-                  onSavedNotice?.()
-                }}
-                className="w-full h-8 px-2.5 text-xs font-mono bg-background border border-input rounded-md text-foreground"
-              />
-            </div>
-          )}
-        </div>
+                {isConnected && (
+                  <div className="p-3 rounded-xl bg-background/80 border border-emerald-500/20 text-xs font-mono flex items-center justify-between">
+                    <span className="text-muted-foreground">Account:</span>
+                    <span className="font-bold text-foreground truncate max-w-[180px]">
+                      {connectedAccount}
+                    </span>
+                  </div>
+                )}
+              </div>
 
-        {/* Snowflake Toggle */}
-        <div className="p-4 rounded-xl border border-border/60 bg-muted/20 space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-lg bg-background border border-border/50 text-cyan-500">
-                <HardDrive className="h-4 w-4" />
-              </div>
-              <div>
-                <h4 className="text-xs font-bold text-foreground">Snowflake Data Lake</h4>
-                <span className="text-[10px] text-muted-foreground">Telemetry stream export</span>
+              <div className="flex items-center gap-2.5 pt-3 border-t border-border/40">
+                {isConnected ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => openConfigureModal(item)}
+                      className="flex-1 py-2.5 px-3 rounded-xl border border-border bg-background hover:bg-muted text-xs font-bold text-foreground flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                    >
+                      <Sliders className="h-4 w-4 text-primary" />
+                      <span>Configure</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => disconnectIntegration(item.id)}
+                      className="py-2.5 px-3 rounded-xl border border-border bg-background hover:bg-red-500/10 text-xs font-bold text-red-500 transition-colors cursor-pointer"
+                    >
+                      Disconnect
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => openConnectModal(item)}
+                    className="w-full py-2.5 px-4 rounded-xl bg-primary text-primary-foreground text-xs font-bold transition-all hover:opacity-95 shadow-2xs flex items-center justify-center gap-1.5 cursor-pointer"
+                  >
+                    <Plug className="h-4 w-4" />
+                    <span>Connect OAuth</span>
+                  </button>
+                )}
               </div>
             </div>
-            <input
-              type="checkbox"
-              checked={data.snowflake}
-              onChange={() => toggleIntegration("snowflake")}
-              className="h-4 w-4 rounded border-input text-primary focus:ring-primary"
-            />
-          </div>
-        </div>
+          )
+        })}
       </div>
 
-      {/* Webhook Endpoint Configuration */}
-      <div className="space-y-1.5 pt-2 border-t border-border/40">
-        <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
-          <Code className="h-3.5 w-3.5 text-primary" />
-          Primary Webhook Listener Endpoint (REST / HTTP POST)
-        </label>
-        <input
-          type="url"
-          value={data.webhookUrl}
-          onChange={(e) => {
-            updateIntegrations({ webhookUrl: e.target.value })
-            onSavedNotice?.()
-          }}
-          placeholder="https://api.yourcompany.com/v1/webhooks/intake"
-          className="w-full h-9 px-3 text-xs font-mono bg-muted/30 border border-input rounded-lg text-foreground focus:ring-2 focus:ring-ring focus:outline-none"
-        />
-      </div>
+      {/* OAuth Connection Modal inside Wizard */}
+      <OAuthModal
+        integration={selectedModalItem}
+        isOpen={isModalOpen}
+        initialStep={modalStep}
+        onClose={() => setIsModalOpen(false)}
+        onOpenLogs={(id) => openLogsModal(id)}
+      />
+
+      {/* Integration Logs Modal */}
+      <IntegrationLogsModal
+        integration={selectedLogsItem}
+        isOpen={isLogsOpen}
+        onClose={() => setIsLogsOpen(false)}
+      />
     </div>
   )
 }

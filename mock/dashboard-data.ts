@@ -67,26 +67,17 @@ export const navigationGroups: NavGroup[] = [
   {
     groupLabel: "WORKSPACE",
     items: [
-      { title: "AI Playground", href: "/playground", icon: "Bot" },
+      { title: "Integrations", href: "/integrations", icon: "Plug" },
       { title: "Workflow Builder", href: "/workflows", icon: "GitFork" },
       { title: "Business Profile", href: "/business-profile", icon: "Building2" },
       { title: "Knowledge Base", href: "/knowledge-base", icon: "FileText" },
-      { title: "Prompt Studio", href: "/prompt-studio", icon: "Sliders" },
-      { title: "Integrations", href: "/integrations", icon: "Plug" }
-    ]
-  },
-  {
-    groupLabel: "OPERATIONS",
-    items: [
-      { title: "Conversations", href: "/conversations", icon: "MessageSquare" },
-      { title: "Activity Center", href: "/activity", icon: "Clock" }
+      { title: "Prompt Studio", href: "/prompt-studio", icon: "Sliders" }
     ]
   },
   {
     groupLabel: "ADMINISTRATION",
     items: [
-      { title: "Users & Permissions", href: "/users", icon: "Users" },
-      { title: "Settings", href: "/settings", icon: "Settings" }
+      { title: "Users & Permissions", href: "/users", icon: "Users" }
     ]
   }
 ]
@@ -274,72 +265,219 @@ export const playgroundScenariosMock: PlaygroundScenario[] = [
   }
 ]
 
-// Workflow Builder Mock Data
-export type WorkflowItem = {
+export type WorkflowActionType =
+  | "crm"
+  | "calendar"
+  | "email"
+  | "whatsapp"
+  | "call"
+  | "notification"
+  | "ticket"
+  | "finance"
+  | "webhook"
+  | "custom"
+
+export type WorkflowAction = {
   id: string
   title: string
   description: string
-  category: "Intake" | "Scheduling" | "Escalation" | "Notification"
-  status: "Active" | "Draft" | "Paused"
-  executionsCount: number
-  lastRun: string
-  nodes: {
-    id: string
-    type: "trigger" | "condition" | "action"
-    label: string
-    subtitle: string
-    icon: string
-  }[]
+  type: WorkflowActionType
+  iconColor?: string
+  config?: Record<string, string>
 }
 
-export const workflowsMock: WorkflowItem[] = [
+export type IntentWorkflow = {
+  id: string
+  title: string
+  intentName: string
+  intentDescription: string
+  description: string
+  category: "Client & Sales" | "Scheduling" | "Support" | "Billing" | "Notifications" | "Custom"
+  status: "Active" | "Inactive"
+  executionsCount: number
+  lastRun: string
+  examplePhrases: string[]
+  confidenceThreshold: number
+  fallbackWorkflow: string
+  actions: WorkflowAction[]
+}
+
+export type WorkflowItem = IntentWorkflow
+
+export const workflowsMock: IntentWorkflow[] = [
   {
     id: "wf-1",
-    title: "New Client Intake & CRM Sync",
-    description: "Captures qualified prospective leads, verifies insurance/retainer, and creates Salesforce/HubSpot deal records.",
-    category: "Intake",
+    title: "New Client",
+    intentName: "New Client",
+    intentDescription: "Customer is a new prospect or potential client showing interest in our services.",
+    description: "When a new client shows interest, create a CRM lead and notify team.",
+    category: "Client & Sales",
     status: "Active",
     executionsCount: 482,
     lastRun: "3 minutes ago",
-    nodes: [
-      { id: "n-1", type: "trigger", label: "New AI Chatbot Conversation", subtitle: "Triggers when a prospect submits initial intake form", icon: "Bot" },
-      { id: "n-2", type: "condition", label: "Evaluate Lead Qualification Score", subtitle: "If Lead Score >= 80 & Insurance Verified", icon: "Sliders" },
-      { id: "n-3", type: "action", label: "Create CRM Lead Record", subtitle: "Pushes contact to Salesforce & HubSpot", icon: "Plug" },
-      { id: "n-4", type: "action", label: "Send Automated SMS Confirmation", subtitle: "Sends Twilio SMS with intake summary", icon: "MessageSquare" }
+    examplePhrases: [
+      "I want to become a client",
+      "I need your services",
+      "Can you help me?",
+      "I'm interested"
+    ],
+    confidenceThreshold: 75,
+    fallbackWorkflow: "General Inquiry",
+    actions: [
+      {
+        id: "act-1",
+        title: "Create CRM Lead",
+        description: "Create a new lead in HubSpot",
+        type: "crm"
+      },
+      {
+        id: "act-2",
+        title: "Assign to Team Member",
+        description: "Assign lead to available team member",
+        type: "notification"
+      },
+      {
+        id: "act-3",
+        title: "Send Welcome Email",
+        description: "Send welcome email to the prospect",
+        type: "email"
+      },
+      {
+        id: "act-4",
+        title: "Send WhatsApp Message",
+        description: "Send introduction message via WhatsApp",
+        type: "whatsapp"
+      }
     ]
   },
   {
     id: "wf-2",
-    title: "Appointment Booking & Calendar Lock",
-    description: "Checks practitioner calendar availability, reserves slot, and sends Google Calendar invites.",
+    title: "Appointment Request",
+    intentName: "Appointment Request",
+    intentDescription: "Customer requests to book, schedule, or confirm an appointment slot.",
+    description: "When customer requests appointment, check calendar and confirm booking.",
     category: "Scheduling",
     status: "Active",
     executionsCount: 310,
     lastRun: "12 minutes ago",
-    nodes: [
-      { id: "n-1", type: "trigger", label: "Appointment Slot Requested", subtitle: "Triggers when customer selects date & time", icon: "Clock" },
-      { id: "n-2", type: "condition", label: "Check Calendar Slot Conflicts", subtitle: "Verifies Google Calendar & Outlook slot availability", icon: "Sliders" },
-      { id: "n-3", type: "action", label: "Lock Calendar Booking", subtitle: "Creates calendar invite & Zoom meeting link", icon: "Plug" },
-      { id: "n-4", type: "action", label: "Dispatch Email Reminder", subtitle: "Sends Gmail confirmation with calendar ICS file", icon: "MessageSquare" }
+    examplePhrases: [
+      "Book an appointment",
+      "Schedule a consultation",
+      "Check available slots",
+      "I want to visit tomorrow"
+    ],
+    confidenceThreshold: 80,
+    fallbackWorkflow: "General Inquiry",
+    actions: [
+      {
+        id: "act-201",
+        title: "Check Calendar",
+        description: "Check Google Calendar & Outlook slot availability",
+        type: "calendar"
+      },
+      {
+        id: "act-202",
+        title: "Show Available Slots",
+        description: "Present available appointment windows to customer",
+        type: "custom"
+      },
+      {
+        id: "act-203",
+        title: "Send Confirmation",
+        description: "Send calendar invite & email confirmation",
+        type: "email"
+      }
     ]
   },
   {
     id: "wf-3",
-    title: "Urgent Escalation & On-Call Alert",
-    description: "Flags severe medical emergencies or high-value litigation cases and immediately pings Slack & SMS on-call teams.",
-    category: "Escalation",
+    title: "Urgent",
+    intentName: "Urgent",
+    intentDescription: "Customer message requires immediate emergency attention or priority escalation.",
+    description: "When customer message is urgent, notify staff immediately.",
+    category: "Notifications",
     status: "Active",
     executionsCount: 64,
     lastRun: "1 hour ago",
-    nodes: [
-      { id: "n-1", type: "trigger", label: "High Severity Sentiment Flagged", subtitle: "Triggers on keywords: emergency, severe pain, breach", icon: "Bot" },
-      { id: "n-2", type: "action", label: "Notify Slack #urgent-intake", subtitle: "Posts rich notification payload to Slack", icon: "MessageSquare" },
-      { id: "n-3", type: "action", label: "Escalate to Human Supervisor", subtitle: "Transfers live session to on-call manager dashboard", icon: "Users" }
+    examplePhrases: [
+      "This is an emergency",
+      "Need immediate help!",
+      "Call me right away",
+      "Critical system failure"
+    ],
+    confidenceThreshold: 70,
+    fallbackWorkflow: "Support",
+    actions: [
+      {
+        id: "act-301",
+        title: "Notify Staff (Call)",
+        description: "Trigger automated phone call to on-call duty staff",
+        type: "call"
+      },
+      {
+        id: "act-302",
+        title: "Escalate Priority",
+        description: "Mark priority as Emergency in workspace dashboard",
+        type: "notification"
+      }
+    ]
+  },
+  {
+    id: "wf-4",
+    title: "Invoice",
+    intentName: "Invoice",
+    intentDescription: "Customer has questions about invoices, receipts, payment links, or billing statement.",
+    description: "When customer has invoice related query, route to finance team.",
+    category: "Billing",
+    status: "Active",
+    executionsCount: 128,
+    lastRun: "2 hours ago",
+    examplePhrases: [
+      "Where is my invoice?",
+      "Send payment link",
+      "Billing enquiry",
+      "I need a receipt"
+    ],
+    confidenceThreshold: 75,
+    fallbackWorkflow: "General Inquiry",
+    actions: [
+      {
+        id: "act-401",
+        title: "Route to Finance",
+        description: "Forward request to Stripe & Finance Slack channel",
+        type: "finance"
+      }
+    ]
+  },
+  {
+    id: "wf-5",
+    title: "Support",
+    intentName: "Support",
+    intentDescription: "Customer needs technical help, issue troubleshooting, or customer care support.",
+    description: "When customer needs support, create a support ticket.",
+    category: "Support",
+    status: "Active",
+    executionsCount: 215,
+    lastRun: "30 minutes ago",
+    examplePhrases: [
+      "I need technical support",
+      "Feature not working",
+      "Help me fix an issue",
+      "Open support ticket"
+    ],
+    confidenceThreshold: 75,
+    fallbackWorkflow: "General Inquiry",
+    actions: [
+      {
+        id: "act-501",
+        title: "Create Support Ticket",
+        description: "Generate new support ticket in Zendesk",
+        type: "ticket"
+      }
     ]
   }
 ]
 
-// Unified Conversations Inbox Mock Data
 export type InboxConversation = {
   id: string
   customerName: string
@@ -435,7 +573,6 @@ export const conversationsInboxMock: InboxConversation[] = [
   }
 ]
 
-// Unified Activity Center Mock Data
 export type ActivityLogEntry = {
   id: string
   category: "AI Activity" | "Workflow Executions" | "Audit History"
@@ -523,7 +660,6 @@ export const activityCenterMock: ActivityLogEntry[] = [
   }
 ]
 
-// Users & Permissions Mock Data
 export type UserItem = {
   id: string
   name: string
@@ -599,11 +735,10 @@ export const usersListMock: UserItem[] = [
 ]
 
 export const quickActionsMock = [
-  { id: "upload-knowledge", title: "Upload Knowledge", description: "Add documents & files", icon: "Upload", href: "/dashboard#knowledge-base" },
-  { id: "configure-prompt", title: "Configure Prompt", description: "Tune your AI assistant", icon: "Sliders", href: "/dashboard#prompt-studio" },
-  { id: "test-ai-assistant", title: "Test AI Assistant", description: "Start a test conversation", icon: "Sparkles", href: "/playground" },
   { id: "connect-integration", title: "Connect Integration", description: "Add new integrations", icon: "PlusCircle", href: "/dashboard#integrations" },
   { id: "create-workflow", title: "Create Workflow", description: "Automate processes", icon: "GitFork", href: "/workflows" },
+  { id: "upload-knowledge", title: "Upload Knowledge", description: "Add documents & files", icon: "Upload", href: "/dashboard#knowledge-base" },
+  { id: "configure-prompt", title: "Configure Prompt", description: "Tune your AI assistant", icon: "Sliders", href: "/dashboard#prompt-studio" },
   { id: "invite-team-member", title: "Invite Team Member", description: "Add users to workspace", icon: "UserPlus", href: "/users" }
 ]
 
@@ -622,7 +757,7 @@ export const integrationsDashboardMock = [
   { id: "hubspot", name: "HubSpot", connected: true, icon: "/icons/hubspot.png" },
   { id: "gcal", name: "Google Calendar", connected: true, icon: "/icons/google-calendar.png" },
   { id: "whatsapp", name: "WhatsApp Business", connected: true, icon: "/icons/whatsapp.png" },
-  { id: "twilio", name: "Twilio (SMS)", connected: false, icon: "/icons/twilio.png" },
+  { id: "voice_agent", name: "AI Voice Agent", connected: true, icon: "/icons/twilio.png" },
   { id: "gmail", name: "Gmail", connected: true, icon: "/icons/gmail.png" }
 ]
 
@@ -659,4 +794,4 @@ export const workflowExecutionsMock: WorkflowExecution[] = []
 export const connectedIntegrationsMock: ConnectedIntegration[] = []
 export const pendingTasksMock: PendingTask[] = []
 export const upcomingRemindersMock: UpcomingReminder[] = []
-export const recentActivityMock: ActivityItem[] = []
+

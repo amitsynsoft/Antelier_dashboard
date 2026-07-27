@@ -1,19 +1,24 @@
 "use client"
 
 import * as React from "react"
-import { cn } from "@/lib/utils"
+import { useRouter } from "next/navigation"
+import { useWorkspace, DemoPresetType } from "@/context/workspace-context"
 import {
   Search,
   Building2,
   Sliders,
   FileText,
   GitFork,
-  Building,
   MessageSquare,
   Sparkles,
   ArrowRight,
   X,
-  Upload
+  Upload,
+  Bot,
+  Settings,
+  Clock,
+  Users,
+  Plug,
 } from "lucide-react"
 
 interface CommandPaletteProps {
@@ -22,6 +27,8 @@ interface CommandPaletteProps {
 }
 
 export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
+  const router = useRouter()
+  const { loadDemoPreset } = useWorkspace()
   const [query, setQuery] = React.useState("")
   const inputRef = React.useRef<HTMLInputElement>(null)
 
@@ -49,15 +56,30 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
 
   if (!isOpen) return null
 
+  const handleAction = (type: string, payload?: string) => {
+    onClose()
+    if (type === "navigate" && payload) {
+      router.push(payload)
+    } else if (type === "preset" && payload) {
+      loadDemoPreset(payload as DemoPresetType)
+    }
+  }
+
   const commandItems = [
-    { title: "Go to Business Profile", category: "Navigation", icon: Building2, action: "profile" },
-    { title: "Open Prompt Studio", category: "AI Assistant", icon: Sliders, action: "prompt" },
-    { title: "Upload Knowledge Base Documents", category: "RAG Knowledge", icon: Upload, action: "knowledge" },
-    { title: "Create Automation Workflow", category: "Workflows", icon: GitFork, action: "workflow" },
-    { title: "Switch Workspace to Chicago Family Law", category: "Workspaces", icon: Building, badge: "Legal" },
-    { title: "Switch Workspace to Smile Dental Group", category: "Workspaces", icon: Building, badge: "Medical" },
-    { title: "Search Documents: Enterprise Security Whitepaper 2026", category: "Documents", icon: FileText, badge: "PDF" },
-    { title: "Search Conversations: Intake #1248 (Alexandra)", category: "Conversations", icon: MessageSquare, badge: "Completed" },
+    { title: "Switch Preset to Healthcare (Aether Health)", category: "Demo Presets", icon: Sparkles, badge: "Healthcare", action: () => handleAction("preset", "Healthcare") },
+    { title: "Switch Preset to Legal (Apex Legal Group)", category: "Demo Presets", icon: Sparkles, badge: "Legal", action: () => handleAction("preset", "Legal") },
+    { title: "Switch Preset to Dental (BrightSmile Dental)", category: "Demo Presets", icon: Sparkles, badge: "Dental", action: () => handleAction("preset", "Dental") },
+    { title: "Switch Preset to Financial Services (Vanguard)", category: "Demo Presets", icon: Sparkles, badge: "Finance", action: () => handleAction("preset", "Financial Services") },
+    { title: "Switch Preset to Real Estate (Prestige Properties)", category: "Demo Presets", icon: Sparkles, badge: "Realty", action: () => handleAction("preset", "Real Estate") },
+
+    { title: "Open Visual Workflow Builder", category: "Navigation", icon: GitFork, action: () => handleAction("navigate", "/workflows") },
+    { title: "Go to Business Profile", category: "Navigation", icon: Building2, action: () => handleAction("navigate", "/business-profile") },
+    { title: "Open Knowledge Base & Documents", category: "Navigation", icon: FileText, action: () => handleAction("navigate", "/knowledge-base") },
+    { title: "Open Prompt Studio", category: "Navigation", icon: Sliders, action: () => handleAction("navigate", "/prompt-studio") },
+    { title: "Open Integrations & Webhooks", category: "Navigation", icon: Plug, action: () => handleAction("navigate", "/integrations") },
+    { title: "Open Users & Permissions", category: "Navigation", icon: Users, action: () => handleAction("navigate", "/users") },
+
+    { title: "Search Document: HIPAA Patient Registration SOP 2026", category: "Knowledge Base", icon: FileText, badge: "PDF", action: () => handleAction("navigate", "/knowledge-base") },
   ]
 
   const filteredItems = commandItems.filter((item) =>
@@ -81,8 +103,8 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search workspaces, knowledge, prompts, documents..."
-            className="w-full h-13 text-sm bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none"
+            placeholder="Search demo presets, pages, knowledge, prompts..."
+            className="w-full h-13 text-xs sm:text-sm bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none"
           />
           <button
             type="button"
@@ -93,37 +115,37 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
           </button>
         </div>
 
-        <div className="max-h-96 overflow-y-auto p-2 divide-y divide-border/30">
+        <div className="max-h-96 overflow-y-auto p-2 divide-y divide-border/30 no-scrollbar">
           {filteredItems.length === 0 ? (
-            <div className="p-8 text-center text-sm text-muted-foreground">
-              No matching commands or resources found for "{query}"
+            <div className="p-8 text-center text-xs text-muted-foreground">
+              No matching commands or demo presets found for "{query}"
             </div>
           ) : (
             <div className="space-y-1">
-              <div className="px-3 py-1.5 text-[10px] uppercase font-bold text-muted-foreground/70 tracking-wider">
-                Quick Actions & Search Results
+              <div className="px-3 py-1.5 text-xs uppercase font-bold text-muted-foreground/70 tracking-wider">
+                Command Engine & Demo Presets
               </div>
               {filteredItems.map((item, idx) => {
                 const ItemIcon = item.icon
                 return (
                   <button
                     key={idx}
-                    onClick={() => onClose()}
+                    onClick={item.action}
                     className="flex items-center justify-between w-full p-2.5 rounded-xl hover:bg-muted/80 text-foreground transition-all group text-left cursor-pointer"
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                    <div className="flex items-center gap-3 overflow-hidden">
+                      <div className="p-2 rounded-lg bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary transition-colors shrink-0">
                         <ItemIcon className="h-4 w-4" />
                       </div>
-                      <div>
-                        <div className="text-sm font-semibold tracking-tight">{item.title}</div>
+                      <div className="overflow-hidden">
+                        <div className="text-xs font-bold tracking-tight truncate">{item.title}</div>
                         <div className="text-[11px] text-muted-foreground mt-0.5">{item.category}</div>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 shrink-0">
                       {item.badge && (
-                        <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-secondary text-secondary-foreground border border-border">
+                        <span className="px-2 py-0.5 text-xs font-bold rounded-full bg-primary/10 text-primary border border-primary/20">
                           {item.badge}
                         </span>
                       )}
@@ -138,11 +160,11 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
 
         <div className="flex items-center justify-between px-4 py-2.5 border-t border-border/60 bg-muted/30 text-xs text-muted-foreground">
           <div className="flex items-center gap-3">
-            <span>Navigate: <kbd className="px-1.5 py-0.5 font-mono text-[10px] bg-background border rounded">↑↓</kbd></span>
-            <span>Select: <kbd className="px-1.5 py-0.5 font-mono text-[10px] bg-background border rounded">↵</kbd></span>
-            <span>Close: <kbd className="px-1.5 py-0.5 font-mono text-[10px] bg-background border rounded">ESC</kbd></span>
+            <span>Navigate: <kbd className="px-1.5 py-0.5 font-mono text-xs bg-background border rounded">↑↓</kbd></span>
+            <span>Select: <kbd className="px-1.5 py-0.5 font-mono text-xs bg-background border rounded">↵</kbd></span>
+            <span>Close: <kbd className="px-1.5 py-0.5 font-mono text-xs bg-background border rounded">ESC</kbd></span>
           </div>
-          <span className="font-semibold text-primary font-mono text-[11px]">Antelier Command Engine</span>
+          <span className="font-bold text-primary font-mono text-xs">Antelier Command Palette</span>
         </div>
       </div>
     </div>

@@ -6,7 +6,6 @@ import { Menu, Search } from "lucide-react"
 import { ThemeSwitcher } from "./theme-switcher"
 import { NotificationCenter } from "./notification-center"
 import { HelpPopover } from "./help-popover"
-import { UserProfileDropdown } from "./user-profile-dropdown"
 
 interface TopNavProps {
   onOpenMobileNav: () => void
@@ -49,13 +48,14 @@ export function TopNav({
         </div>
       </div>
 
-      {/* Global Actions Header: Search, Notifications, Help, Theme, User Profile */}
-      <div className="flex items-center gap-2.5 sm:gap-3 ml-auto">
+      {/* Global Actions Header: Search, Notifications, Help, Theme */}
+      <div className="flex items-center gap-2 sm:gap-3 ml-auto">
+
         {/* Global Command Search */}
         <button
           type="button"
           onClick={onOpenCommandPalette}
-          className="group flex w-44 sm:w-64 md:w-80 cursor-pointer items-center justify-between rounded-xl border border-border/70 bg-muted/40 px-3.5 py-2 text-xs sm:text-sm text-muted-foreground shadow-2xs transition-all hover:bg-muted/70 hover:text-foreground"
+          className="group flex w-40 sm:w-60 md:w-72 cursor-pointer items-center justify-between rounded-xl border border-border/70 bg-muted/40 px-3.5 py-2 text-xs sm:text-sm text-muted-foreground shadow-2xs transition-all hover:bg-muted/70 hover:text-foreground"
         >
           <div className="flex items-center gap-2.5 overflow-hidden">
             <Search className="h-4 w-4 shrink-0 text-muted-foreground transition-colors group-hover:text-primary" />
@@ -77,9 +77,6 @@ export function TopNav({
 
         {/* Theme Mode Toggle (Icon only) */}
         <ThemeSwitcher />
-
-        {/* User Profile Dropdown on Navbar */}
-        <UserProfileDropdown />
       </div>
     </header>
   )

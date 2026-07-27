@@ -27,12 +27,6 @@ export function RecentActivityFeed() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <h3 className="text-base font-bold text-foreground">Recent Activity</h3>
-        <a
-          href="#activity-logs"
-          className="text-xs font-semibold text-primary hover:underline"
-        >
-          View all
-        </a>
       </div>
 
       {/* Activity Timeline */}

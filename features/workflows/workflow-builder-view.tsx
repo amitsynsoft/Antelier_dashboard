@@ -1,296 +1,421 @@
 "use client"
 
 import * as React from "react"
-import { motion } from "framer-motion"
-import { AppPage, PageHeader } from "@/components/layout/app-page"
-import { workflowsMock, WorkflowItem } from "@/mock/dashboard-data"
+import { toast } from "sonner"
+import { AppPage } from "@/components/layout/app-page"
+import { workflowsMock } from "@/mock/dashboard-data"
 import {
   GitFork,
-  Play,
-  CheckCircle2,
-  Sliders,
-  Bot,
-  Plug,
-  MessageSquare,
-  Clock,
+  Plus,
   Zap,
-  ArrowDown,
-  X,
+  Sliders,
+  Play,
+  Copy,
+  Trash2,
+  CheckCircle2,
+  Sparkles,
 } from "lucide-react"
 
-export function WorkflowBuilderView() {
-  const [selectedWorkflow, setSelectedWorkflow] = React.useState<WorkflowItem>(
-    workflowsMock[0]
-  )
-  const [selectedNode, setSelectedNode] = React.useState<WorkflowItem["nodes"][0] | null>(
-    workflowsMock[0].nodes[0]
-  )
-  const [isSimulating, setIsSimulating] = React.useState(false)
-  const [simResults, setSimResults] = React.useState<string | null>(null)
+import { IntentWorkflow, WorkflowAction, WorkflowActionType, IntentCategory } from "./types"
+import { WORKFLOW_CATEGORIES, WorkflowCategoryFilter } from "./config"
+import { WorkflowSidebar } from "./components/workflow-sidebar"
+import { WorkflowIntentEditor } from "./components/workflow-intent-editor"
+import { WorkflowActionsList } from "./components/workflow-actions-list"
+import { AddWorkflowModal } from "./components/modals/add-workflow-modal"
+import { AddActionModal } from "./components/modals/add-action-modal"
+import { TestWorkflowModal } from "./components/modals/test-workflow-modal"
+import { ImportWorkflowModal } from "./components/modals/import-workflow-modal"
 
-  const handleRunSimulation = () => {
-    setIsSimulating(true)
-    setSimResults(null)
-    setTimeout(() => {
-      setIsSimulating(false)
-      setSimResults(`Workflow "${selectedWorkflow.title}" executed 4/4 nodes successfully in 420ms!`)
-    }, 1500)
+export function WorkflowBuilderView() {
+  // Main State
+  const [workflows, setWorkflows] = React.useState<IntentWorkflow[]>(workflowsMock)
+  const [selectedWorkflowId, setSelectedWorkflowId] = React.useState<string>(workflowsMock[0].id)
+  const [activeCategory, setActiveCategory] = React.useState<WorkflowCategoryFilter>("All Workflows")
+  const [searchQuery, setSearchQuery] = React.useState<string>("")
+  const [activeTab, setActiveTab] = React.useState<"actions" | "intent">("actions")
+
+  // Modals state
+  const [isAddWorkflowOpen, setIsAddWorkflowOpen] = React.useState(false)
+  const [isAddActionOpen, setIsAddActionOpen] = React.useState(false)
+  const [isTestModalOpen, setIsTestModalOpen] = React.useState(false)
+  const [isImportModalOpen, setIsImportModalOpen] = React.useState(false)
+
+  // Selected workflow getter
+  const selectedWorkflow = React.useMemo(() => {
+    return workflows.find((w) => w.id === selectedWorkflowId) || workflows[0]
+  }, [workflows, selectedWorkflowId])
+
+  // Filtered workflows list
+  const filteredWorkflows = React.useMemo(() => {
+    return workflows.filter((wf) => {
+      const matchesCategory =
+        activeCategory === "All Workflows" || wf.category === activeCategory
+      const matchesSearch =
+        wf.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        wf.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        wf.intentName.toLowerCase().includes(searchQuery.toLowerCase())
+      return matchesCategory && matchesSearch
+    })
+  }, [workflows, activeCategory, searchQuery])
+
+  // Helper: Global Toast message
+  const showFeedback = (msg: string) => {
+    toast.success(msg)
+  }
+
+  // Update selected workflow fields
+  const updateSelectedWorkflow = (updates: Partial<IntentWorkflow>) => {
+    setWorkflows((prev) =>
+      prev.map((w) => (w.id === selectedWorkflow.id ? { ...w, ...updates } : w))
+    )
+  }
+
+  // Status toggle
+  const handleToggleStatus = (id: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation()
+    setWorkflows((prev) =>
+      prev.map((w) =>
+        w.id === id ? { ...w, status: w.status === "Active" ? "Inactive" : "Active" } : w
+      )
+    )
+    toast.info("Workflow status updated.")
+  }
+
+  // Example phrases actions
+  const handleAddPhrase = (phrase: string) => {
+    updateSelectedWorkflow({
+      examplePhrases: [...selectedWorkflow.examplePhrases, phrase],
+    })
+    showFeedback("Example phrase added.")
+  }
+
+  const handleRemovePhrase = (index: number) => {
+    updateSelectedWorkflow({
+      examplePhrases: selectedWorkflow.examplePhrases.filter((_, idx) => idx !== index),
+    })
+  }
+
+  // Action step controls
+  const handleMoveAction = (index: number, direction: "up" | "down") => {
+    const newActions = [...selectedWorkflow.actions]
+    const targetIndex = direction === "up" ? index - 1 : index + 1
+    if (targetIndex < 0 || targetIndex >= newActions.length) return
+    const temp = newActions[index]
+    newActions[index] = newActions[targetIndex]
+    newActions[targetIndex] = temp
+    updateSelectedWorkflow({ actions: newActions })
+  }
+
+  const handleDeleteAction = (actionId: string) => {
+    updateSelectedWorkflow({
+      actions: selectedWorkflow.actions.filter((a) => a.id !== actionId),
+    })
+    toast.info("Action step removed.")
+  }
+
+  const handleAddActionStep = (actionType: WorkflowActionType, title: string, desc: string) => {
+    const newActionItem: WorkflowAction = {
+      id: `act-${Date.now()}`,
+      title,
+      description: desc,
+      type: actionType,
+    }
+    updateSelectedWorkflow({ actions: [...selectedWorkflow.actions, newActionItem] })
+    showFeedback(`Added "${title}" action step.`)
+  }
+
+  const handleCreateWorkflow = (title: string, category: IntentCategory, desc: string) => {
+    const newWf: IntentWorkflow = {
+      id: `wf-${Date.now()}`,
+      title,
+      intentName: title,
+      intentDescription: desc || `Automated intent handler for ${title}`,
+      description: `When AI detects intent "${title}", trigger business actions.`,
+      category,
+      status: "Active",
+      executionsCount: 0,
+      lastRun: "Just now",
+      examplePhrases: [`I need ${title.toLowerCase()}`, `Help with ${title.toLowerCase()}`],
+      confidenceThreshold: 75,
+      fallbackWorkflow: "General Inquiry",
+      actions: [
+        {
+          id: `act-${Date.now()}`,
+          title: "Notify Team",
+          description: "Send alert to team channel",
+          type: "notification",
+        },
+      ],
+    }
+    setWorkflows((prev) => [...prev, newWf])
+    setSelectedWorkflowId(newWf.id)
+    setActiveTab("actions")
+    showFeedback(`Workflow "${newWf.title}" created successfully!`)
+  }
+
+  const handleDuplicateWorkflow = () => {
+    const cloned: IntentWorkflow = {
+      ...selectedWorkflow,
+      id: `wf-${Date.now()}`,
+      title: `${selectedWorkflow.title} (Copy)`,
+      intentName: `${selectedWorkflow.intentName} Copy`,
+      executionsCount: 0,
+      lastRun: "Never",
+      actions: selectedWorkflow.actions.map((a) => ({ ...a, id: `act-${Math.random()}` })),
+    }
+    setWorkflows((prev) => [...prev, cloned])
+    setSelectedWorkflowId(cloned.id)
+    showFeedback(`Duplicated workflow "${selectedWorkflow.title}".`)
+  }
+
+  const handleDeleteWorkflow = () => {
+    if (workflows.length <= 1) {
+      toast.error("Cannot delete the only workflow in library.")
+      return
+    }
+    const remaining = workflows.filter((w) => w.id !== selectedWorkflow.id)
+    setWorkflows(remaining)
+    setSelectedWorkflowId(remaining[0].id)
+    toast.info(`Deleted workflow "${selectedWorkflow.title}".`)
   }
 
   return (
     <AppPage>
-      {/* Standardized Page Header */}
-      <PageHeader
-        title="Visual Workflow Builder"
-        subtitle="Design visual automation triggers, business conditions, and integration action steps."
-        icon={<GitFork className="h-5 w-5" />}
-        badge={
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-            <CheckCircle2 className="h-3.5 w-3.5" />
-            Validated & Live (v3.2)
-          </span>
-        }
-        actions={
-          <button
-            type="button"
-            onClick={handleRunSimulation}
-            disabled={isSimulating}
-            className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-primary px-4 py-2 text-xs sm:text-sm font-semibold text-primary-foreground shadow-2xs hover:opacity-95 transition-all disabled:opacity-50"
-          >
-            {isSimulating ? (
-              <>
-                <Zap className="h-4 w-4 animate-spin" />
-                <span>Simulating...</span>
-              </>
-            ) : (
-              <>
-                <Play className="h-4 w-4 fill-current" />
-                <span>Run Test Simulation</span>
-              </>
-            )}
-          </button>
-        }
-      />
-
-      {/* Simulation Feedback Toast */}
-      {simResults && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex items-center justify-between p-3.5 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 text-xs font-semibold shadow-2xs"
-        >
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500" />
-            <span>{simResults}</span>
-          </div>
-          <button
-            type="button"
-            onClick={() => setSimResults(null)}
-            className="text-muted-foreground hover:text-foreground cursor-pointer"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </motion.div>
-      )}
-
-      {/* Template Selectors */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        {workflowsMock.map((wf) => {
-          const isSelected = wf.id === selectedWorkflow.id
-          return (
-            <button
-              key={wf.id}
-              type="button"
-              onClick={() => {
-                setSelectedWorkflow(wf)
-                setSelectedNode(wf.nodes[0])
-              }}
-              className={`p-4 rounded-2xl border text-left transition-all cursor-pointer ${
-                isSelected
-                  ? "border-primary/40 bg-primary/10 shadow-2xs"
-                  : "border-border/60 bg-card hover:bg-muted/50"
-              }`}
-            >
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
-                  {wf.category} Workflow
-                </span>
-                <span className="text-[10px] font-semibold text-muted-foreground">
-                  {wf.executionsCount} Runs
-                </span>
-              </div>
-              <h4 className="text-sm font-bold text-foreground leading-tight">
-                {wf.title}
-              </h4>
-              <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                {wf.description}
-              </p>
-            </button>
-          )
-        })}
-      </div>
-
-      {/* Main Builder Grid: Canvas (8 cols) + Properties Panel (4 cols) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-[540px]">
-        {/* VISUAL CANVAS (8 cols) */}
-        <div className="lg:col-span-8 rounded-3xl border border-border/70 bg-gradient-to-b from-card via-card to-muted/20 p-6 shadow-xs flex flex-col items-center justify-start space-y-4 relative overflow-hidden">
-          <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.06] bg-[radial-gradient(#000_1px,transparent_1px)] dark:bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none" />
-
-          <div className="w-full flex items-center justify-between z-10 border-b border-border/40 pb-3 mb-2">
+      {/* Header Bar */}
+      <div className="flex flex-col gap-4 border-b border-border/60 pb-5 pt-1 sm:flex-row sm:items-center sm:justify-between">
+        <div className="space-y-1">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-orange-500/30 bg-orange-500/10 text-orange-500 shadow-2xs">
+              <GitFork className="h-5 w-5" />
+            </div>
             <div>
-              <h3 className="text-sm font-bold text-foreground">
-                Canvas Diagram: {selectedWorkflow.title}
-              </h3>
-              <p className="text-xs text-muted-foreground">
-                Click any node to inspect its properties & integration mappings.
+              <h1 className="text-2xl font-extrabold tracking-tight text-foreground sm:text-3xl">
+                Workflow Builder
+              </h1>
+              <p className="text-xs text-muted-foreground sm:text-sm">
+                Create intent-driven workflows that automate how your AI responds and takes action.
               </p>
             </div>
-            <span className="text-[11px] font-mono text-muted-foreground">
-              4 Nodes Connected
-            </span>
-          </div>
-
-          <div className="w-full max-w-xl space-y-4 z-10 flex flex-col items-center">
-            {selectedWorkflow.nodes.map((node, index) => {
-              const isSelected = selectedNode?.id === node.id
-
-              let nodeBadgeColor = "bg-blue-500/10 text-blue-600 border-blue-500/30"
-              if (node.type === "condition") {
-                nodeBadgeColor = "bg-amber-500/10 text-amber-600 border-amber-500/30"
-              } else if (node.type === "action") {
-                nodeBadgeColor = "bg-emerald-500/10 text-emerald-600 border-emerald-500/30"
-              }
-
-              return (
-                <React.Fragment key={node.id}>
-                  {index > 0 && (
-                    <div className="flex flex-col items-center my-1 text-primary">
-                      <div className="h-4 w-0.5 bg-primary/40" />
-                      <ArrowDown className="h-4 w-4 text-primary" />
-                    </div>
-                  )}
-
-                  <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    onClick={() => setSelectedNode(node)}
-                    className={`w-full p-4 rounded-2xl border transition-all cursor-pointer shadow-xs ${
-                      isSelected
-                        ? "border-primary/60 bg-card ring-2 ring-primary/20 shadow-md"
-                        : "border-border/70 bg-card hover:bg-muted/40"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className={`flex h-9 w-9 items-center justify-center rounded-xl border text-sm font-bold ${nodeBadgeColor}`}>
-                          {node.type === "trigger" ? "⚡" : node.type === "condition" ? "⚙️" : "🚀"}
-                        </div>
-                        <div>
-                          <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border ${nodeBadgeColor}`}>
-                            {node.type}
-                          </span>
-                          <h4 className="text-sm font-bold text-foreground mt-1">
-                            {node.label}
-                          </h4>
-                          <p className="text-xs text-muted-foreground mt-0.5">
-                            {node.subtitle}
-                          </p>
-                        </div>
-                      </div>
-
-                      <span className="text-xs font-semibold text-muted-foreground">
-                        Configure →
-                      </span>
-                    </div>
-                  </motion.div>
-                </React.Fragment>
-              )
-            })}
           </div>
         </div>
 
-        {/* NODE PROPERTIES PANEL (4 cols) */}
-        <div className="lg:col-span-4 rounded-3xl border border-border/70 bg-card p-5 shadow-xs space-y-4">
-          {selectedNode ? (
-            <>
-              <div className="border-b border-border/60 pb-3">
-                <span className="text-[10px] font-bold text-primary uppercase tracking-wider">
-                  Node Configuration
-                </span>
-                <h3 className="text-base font-bold text-foreground mt-0.5">
-                  {selectedNode.label}
-                </h3>
-                <p className="text-xs text-muted-foreground">
-                  Node ID: <code className="font-mono text-foreground">{selectedNode.id}</code>
-                </p>
-              </div>
+        <div className="flex items-center gap-2.5">
+          <button
+            type="button"
+            onClick={() => setIsImportModalOpen(true)}
+            className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-border/70 bg-card px-3.5 py-2 text-xs font-bold text-foreground shadow-2xs transition-all hover:bg-muted/60 sm:text-sm"
+          >
+            <Zap className="h-4 w-4 text-orange-500" />
+            <span>Import Workflow</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsAddWorkflowOpen(true)}
+            className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-orange-600 px-4 py-2 text-xs font-bold text-white shadow-sm transition-all hover:bg-orange-500 sm:text-sm"
+          >
+            <Plus className="h-4 w-4" />
+            <span>New Workflow</span>
+          </button>
+        </div>
+      </div>
 
-              <div className="space-y-3.5">
-                <div>
-                  <label className="text-xs font-bold text-foreground block mb-1">
-                    Node Title
-                  </label>
-                  <input
-                    type="text"
-                    value={selectedNode.label}
-                    readOnly
-                    className="w-full rounded-xl border border-border/70 bg-muted/30 px-3 py-2 text-xs font-semibold text-foreground focus:outline-none"
-                  />
+      {/* Categories & Search */}
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+          {WORKFLOW_CATEGORIES.map((cat) => {
+            const isActive = activeCategory === cat
+            return (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => setActiveCategory(cat)}
+                className={`whitespace-nowrap rounded-xl px-3.5 py-1.5 text-xs font-bold transition-all cursor-pointer ${
+                  isActive
+                    ? "bg-orange-600 text-white shadow-2xs"
+                    : "border border-border/60 bg-card text-muted-foreground hover:bg-muted hover:text-foreground"
+                }`}
+              >
+                {cat}
+              </button>
+            )
+          })}
+        </div>
+
+        <div className="relative min-w-[240px]">
+          <input
+            type="text"
+            placeholder="Search workflows by intent or action..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="h-10 w-full rounded-xl border border-border/70 bg-card px-3.5 text-xs text-foreground focus:border-orange-500 focus:outline-none"
+          />
+        </div>
+      </div>
+
+      {/* 2-Column Builder Layout */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 items-start">
+        {/* Left Column: Workflows Sidebar List (4 cols) */}
+        <div className="lg:col-span-4 sticky top-6">
+          <WorkflowSidebar
+            workflows={filteredWorkflows}
+            selectedWorkflowId={selectedWorkflowId}
+            onSelectWorkflow={setSelectedWorkflowId}
+            onToggleStatus={handleToggleStatus}
+            onOpenAddWorkflow={() => setIsAddWorkflowOpen(true)}
+          />
+        </div>
+
+        {/* Right Column: Active Workflow Canvas Viewport (8 cols) */}
+        <div className="space-y-4 lg:col-span-8">
+          {selectedWorkflow ? (
+            <div className="space-y-4">
+              {/* Active Workflow Header Card */}
+              <div className="rounded-3xl border border-border/70 bg-card p-5 shadow-xs space-y-4">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-orange-500/30 bg-orange-500/10 text-orange-500 font-extrabold text-base shadow-2xs">
+                      ⚡
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h2 className="text-lg font-bold text-foreground">
+                          {selectedWorkflow.title}
+                        </h2>
+                        <span className="rounded-lg border border-border bg-muted/40 px-2.5 py-0.5 font-mono text-[10px] font-bold text-muted-foreground">
+                          {selectedWorkflow.category}
+                        </span>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {selectedWorkflow.description}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setIsTestModalOpen(true)}
+                      className="inline-flex items-center gap-1.5 rounded-xl border border-orange-500/40 bg-orange-500/10 px-3 py-2 text-xs font-bold text-orange-600 dark:text-orange-400 hover:bg-orange-500/20 cursor-pointer shadow-2xs"
+                    >
+                      <Play className="h-3.5 w-3.5" />
+                      <span>Test Run</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleDuplicateWorkflow}
+                      className="rounded-xl border border-border bg-background p-2 text-muted-foreground hover:text-foreground cursor-pointer"
+                      title="Duplicate Workflow"
+                    >
+                      <Copy className="h-4 w-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleDeleteWorkflow}
+                      className="rounded-xl border border-border bg-background p-2 text-muted-foreground hover:text-rose-500 cursor-pointer"
+                      title="Delete Workflow"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
                 </div>
 
-                <div>
-                  <label className="text-xs font-bold text-foreground block mb-1">
-                    Execution Category
-                  </label>
-                  <input
-                    type="text"
-                    value={selectedNode.type.toUpperCase()}
-                    readOnly
-                    className="w-full rounded-xl border border-border/70 bg-muted/30 px-3 py-2 text-xs font-mono font-bold text-primary focus:outline-none"
-                  />
-                </div>
+                {/* Sub-Header Tab Switcher: Put Actions front & center! */}
+                <div className="flex items-center justify-between border-t border-border/50 pt-3">
+                  <div className="flex items-center gap-2 bg-muted/40 p-1 rounded-2xl border border-border/40">
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab("actions")}
+                      className={`flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
+                        activeTab === "actions"
+                          ? "bg-card text-foreground shadow-2xs border border-border/60"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      <Zap className="h-3.5 w-3.5 text-orange-500" />
+                      <span>Actions & Flow ({selectedWorkflow.actions.length})</span>
+                    </button>
 
-                <div>
-                  <label className="text-xs font-bold text-foreground block mb-1">
-                    Target Integration Payload
-                  </label>
-                  <textarea
-                    rows={3}
-                    readOnly
-                    value={JSON.stringify(
-                      {
-                        action: selectedNode.label,
-                        payload: { client_id: "intake_982", status: "active" },
-                        retry_policy: "exponential_backoff"
-                      },
-                      null,
-                      2
-                    )}
-                    className="w-full rounded-xl border border-border/70 bg-muted/30 p-2.5 text-[11px] font-mono text-muted-foreground focus:outline-none"
-                  />
-                </div>
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab("intent")}
+                      className={`flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
+                        activeTab === "intent"
+                          ? "bg-card text-foreground shadow-2xs border border-border/60"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      <Sliders className="h-3.5 w-3.5 text-blue-500" />
+                      <span>Trigger & Intent Rules</span>
+                    </button>
+                  </div>
 
-                <div className="p-3 rounded-2xl border border-border/60 bg-muted/20 space-y-1">
-                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-                    Node Performance Metrics
+                  <span className="hidden sm:inline-flex items-center gap-1.5 font-mono text-xs text-muted-foreground">
+                    Confidence threshold: <strong className="text-foreground">{selectedWorkflow.confidenceThreshold}%</strong>
                   </span>
-                  <div className="flex items-center justify-between text-xs pt-1">
-                    <span className="text-muted-foreground">Avg Latency:</span>
-                    <span className="font-bold text-foreground">112ms</span>
-                  </div>
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground">Pass Rate:</span>
-                    <span className="font-bold text-emerald-600 dark:text-emerald-400">99.8%</span>
-                  </div>
                 </div>
               </div>
-            </>
+
+              {/* Tab Content Display */}
+              {activeTab === "actions" ? (
+                <WorkflowActionsList
+                  workflow={selectedWorkflow}
+                  onMoveAction={handleMoveAction}
+                  onDeleteAction={handleDeleteAction}
+                  onOpenAddAction={() => setIsAddActionOpen(true)}
+                  onQuickAddAction={handleAddActionStep}
+                />
+              ) : (
+                <WorkflowIntentEditor
+                  workflow={selectedWorkflow}
+                  onUpdateWorkflow={updateSelectedWorkflow}
+                  onAddPhrase={handleAddPhrase}
+                  onRemovePhrase={handleRemovePhrase}
+                />
+              )}
+            </div>
           ) : (
-            <div className="p-8 text-center text-xs text-muted-foreground">
-              Select a node on the canvas to inspect properties.
+            <div className="flex h-64 flex-col items-center justify-center rounded-3xl border border-dashed border-border bg-card p-6 text-center">
+              <p className="text-sm font-semibold text-muted-foreground">
+                No workflow selected or found matching filter.
+              </p>
+              <button
+                type="button"
+                onClick={() => setIsAddWorkflowOpen(true)}
+                className="mt-3 rounded-xl bg-orange-600 px-4 py-2 text-xs font-bold text-white hover:bg-orange-500"
+              >
+                Create Workflow
+              </button>
             </div>
           )}
         </div>
       </div>
+
+      {/* Modals */}
+      <AddWorkflowModal
+        isOpen={isAddWorkflowOpen}
+        onClose={() => setIsAddWorkflowOpen(false)}
+        onCreateWorkflow={handleCreateWorkflow}
+      />
+
+      <AddActionModal
+        isOpen={isAddActionOpen}
+        onClose={() => setIsAddActionOpen(false)}
+        onAddAction={handleAddActionStep}
+      />
+
+      <TestWorkflowModal
+        isOpen={isTestModalOpen}
+        workflow={selectedWorkflow}
+        onClose={() => setIsTestModalOpen(false)}
+      />
+
+      <ImportWorkflowModal
+        isOpen={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+        onImportSuccess={() => {
+          showFeedback(`Imported workflow templates into workspace.`)
+        }}
+      />
     </AppPage>
   )
 }

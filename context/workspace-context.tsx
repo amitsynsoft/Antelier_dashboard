@@ -1,6 +1,9 @@
 "use client"
 
 import * as React from "react"
+import { currentUser } from "@/mock/dashboard-data"
+
+export type DemoPresetType = "Healthcare" | "Legal" | "Dental" | "Financial Services" | "Real Estate"
 
 export type BusinessProfileData = {
   companyName: string
@@ -38,71 +41,360 @@ export type IntegrationsData = {
   slackChannel?: string
   webhookUrl: string
   snowflake: boolean
+  connectedMap?: Record<string, boolean>
+  accountsMap?: Record<string, string>
+  configsMap?: Record<string, Record<string, string>>
+  lastSyncMap?: Record<string, string>
 }
 
 export type WorkspaceState = {
+  activePreset: DemoPresetType
   isOnboarded: boolean
   showWizardModal: boolean
   currentStep: number
+  skippedSteps: number[]
   businessProfile: BusinessProfileData
   knowledgeBase: KnowledgeBaseData
   aiAssistant: AiAssistantData
   integrations: IntegrationsData
 }
 
-const defaultState: WorkspaceState = {
-  isOnboarded: false,
-  showWizardModal: true,
-  currentStep: 1,
-  businessProfile: {
-    companyName: "Antelier Tech Global",
-    industry: "Enterprise Software & AI",
-    companySize: "1,000 - 5,000",
-    targetTier: "Fortune 500 & Mid-Market",
-    brandTone: "consultative",
-    primaryIntakeGoal: "Qualify RFP leads & automate SOC-2 compliance checks",
-    supportEmail: "intake-ops@antelier.io"
+export const demoPresetsData: Record<DemoPresetType, Omit<WorkspaceState, "isOnboarded" | "showWizardModal" | "currentStep" | "skippedSteps">> = {
+  Healthcare: {
+    activePreset: "Healthcare",
+    businessProfile: {
+      companyName: "Aether Health Systems",
+      industry: "Healthcare & Telehealth",
+      companySize: "1,000 - 5,000",
+      targetTier: "Hospital Networks & Outpatient Clinics",
+      brandTone: "consultative",
+      primaryIntakeGoal: "Automate HIPAA-compliant patient intake, insurance copay verification, and triage",
+      supportEmail: "patient-intake@aetherhealth.org"
+    },
+    knowledgeBase: {
+      sourcesCount: 6,
+      uploadedFiles: [
+        "HIPAA_Patient_Registration_SOP_2026.pdf",
+        "Insurance_Copay_Coverage_Matrix.xlsx",
+        "Clinical_Triage_Protocols_v4.pdf"
+      ],
+      scrapeUrls: ["https://aetherhealth.org/patient-portal", "https://aetherhealth.org/insurance"],
+      syncInterval: "realtime",
+      autoParsePdf: true
+    },
+    aiAssistant: {
+      agentName: "Ava (Clinical Intake Copilot)",
+      avatar: "https://images.unsplash.com/photo-1594824813566-88855ce7890b?auto=format&fit=crop&w=250&q=80",
+      primaryModel: "gpt-4o",
+      systemPrompt:
+        "You are Ava, a certified clinical intake coordinator for Aether Health Systems. Verify patient DOB, insurance provider, policy ID, and chief complaint while maintaining strict HIPAA privacy compliance.",
+      greetingMessage:
+        "Hello, welcome to Aether Health Systems! I'm Ava, your virtual clinical intake coordinator. I can help register your patient file, check insurance copays, or schedule a doctor consultation.",
+      handoffScoreThreshold: 85,
+      escalationRole: "Duty Triage Nurse"
+    },
+    integrations: {
+      salesforce: true,
+      salesforceOrgId: "00D80000000hYxE",
+      hubspot: true,
+      slack: true,
+      slackChannel: "#urgent-patient-triage",
+      webhookUrl: "https://api.aetherhealth.org/v1/ehr/intake-webhook",
+      snowflake: true,
+      connectedMap: {
+        hubspot: true,
+        gmail: true,
+        whatsapp: true,
+        voice_agent: true,
+        gcal: true,
+        salesforce: true,
+        slack: true,
+        snowflake: true
+      },
+      accountsMap: {
+        hubspot: "alexandra@aetherhealth-crm.hubspot.com",
+        gmail: "alexandra@antelier.io",
+        whatsapp: "+1 (312) 555-0198 (Verified Business)",
+        voice_agent: "Vapi / ElevenLabs (us-east-1)",
+        gcal: "scheduling@aetherhealth.org",
+        salesforce: "org_00D80000000hYxE (Aether Health)",
+        slack: "antelier-workspace.slack.com (#urgent-intake)",
+        snowflake: "antelier_corp.snowflakecomputing.com"
+      },
+      configsMap: {
+        hubspot: { pipeline: "Sales Inbound Pipeline", leadOwner: "Alexandra (Workspace Owner)", syncFrequency: "Real-time (Instant)", defaultStage: "New Qualified Lead" },
+        gmail: { senderEmail: "alexandra@antelier.io", replyAddress: "support@aetherhealth.org" },
+        whatsapp: { businessNumber: "+1 (312) 555-0198", defaultTemplate: "Instant Intake & Triage (English)", autoReply: "Enabled 24/7" },
+        voice_agent: { voiceModel: "Antelier Turbo Voice v2.5", voicePersona: "Ava - Warm & Professional (Female)", language: "English (US)" }
+      },
+      lastSyncMap: {
+        hubspot: "2 mins ago",
+        gmail: "5 mins ago",
+        whatsapp: "12 mins ago",
+        voice_agent: "30 mins ago",
+        gcal: "45 mins ago"
+      }
+    }
   },
-  knowledgeBase: {
-    sourcesCount: 4,
-    uploadedFiles: [
-      "Enterprise_Security_Whitepaper_2026.pdf",
-      "Standard_Master_Services_Agreement.docx",
-      "API_Integration_Capabilities_Guide.pdf"
-    ],
-    scrapeUrls: ["https://antelier.io/docs", "https://antelier.io/pricing"],
-    syncInterval: "hourly",
-    autoParsePdf: true
+  Legal: {
+    activePreset: "Legal",
+    businessProfile: {
+      companyName: "Apex Legal Group LLP",
+      industry: "Corporate & Commercial Law",
+      companySize: "250 - 500",
+      targetTier: "Enterprise Clients & High Net Worth Individuals",
+      brandTone: "formal",
+      primaryIntakeGoal: "Execute automated conflict of interest checks, retainer evaluations, and case briefs",
+      supportEmail: "client-intake@apexlegal.com"
+    },
+    knowledgeBase: {
+      sourcesCount: 8,
+      uploadedFiles: [
+        "Master_Retainer_Agreement_Template.pdf",
+        "Conflict_of_Interest_Policy_2026.pdf",
+        "Corporate_Litigation_Intake_Guide.pdf"
+      ],
+      scrapeUrls: ["https://apexlegal.com/practice-areas", "https://apexlegal.com/fee-structure"],
+      syncInterval: "hourly",
+      autoParsePdf: true
+    },
+    aiAssistant: {
+      agentName: "Justinian (Legal Intake Specialist)",
+      avatar: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=250&q=80",
+      primaryModel: "claude-3.5-sonnet",
+      systemPrompt:
+        "You are Justinian, lead intake specialist for Apex Legal Group LLP. Conduct preliminary case assessments, perform conflict of interest screening, and gather opposing party details.",
+      greetingMessage:
+        "Welcome to Apex Legal Group LLP. I am Justinian, your legal intake assistant. I can assist with confidential case evaluation, conflict screening, and retainer scheduling.",
+      handoffScoreThreshold: 90,
+      escalationRole: "Senior Partner On-Call"
+    },
+    integrations: {
+      salesforce: true,
+      salesforceOrgId: "00D80000000legal",
+      hubspot: true,
+      slack: true,
+      slackChannel: "#legal-case-intake",
+      webhookUrl: "https://api.apexlegal.com/v1/clio/intake-sync",
+      snowflake: false,
+      connectedMap: {
+        hubspot: true,
+        gmail: true,
+        whatsapp: false,
+        voice_agent: true
+      },
+      accountsMap: {
+        hubspot: "sales@apexlegal.com",
+        gmail: "client-intake@apexlegal.com"
+      }
+    }
   },
-  aiAssistant: {
-    agentName: "Antelier Enterprise Intake Copilot",
-    avatar: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=250&q=80",
-    primaryModel: "gpt-4o",
-    systemPrompt:
-      "You are the senior client intake specialist for Antelier. Your objective is to politely qualify prospective enterprise clients, check technical requirements, and route leads with score >= 85 directly to Senior Account Executives.",
-    greetingMessage:
-      "Hello! Welcome to Antelier. I can help answer technical specifications, evaluate custom enterprise SLAs, or guide your team through our client intake process.",
-    handoffScoreThreshold: 85,
-    escalationRole: "Senior Enterprise AE"
+  Dental: {
+    activePreset: "Dental",
+    businessProfile: {
+      companyName: "BrightSmile Dental Centers",
+      industry: "Dental & Orthodontics",
+      companySize: "50 - 100",
+      targetTier: "Patients & Family Care Plans",
+      brandTone: "friendly",
+      primaryIntakeGoal: "Schedule appointment bookings, pre-authorize dental insurance claims, and emergency dental triage",
+      supportEmail: "care@brightsmiledental.com"
+    },
+    knowledgeBase: {
+      sourcesCount: 4,
+      uploadedFiles: [
+        "Dental_Insurance_PreAuth_Guidelines.pdf",
+        "Patient_Teeth_Cleaning_SOP.pdf",
+        "Orthodontic_Financing_Plans.pdf"
+      ],
+      scrapeUrls: ["https://brightsmiledental.com/services", "https://brightsmiledental.com/booking"],
+      syncInterval: "realtime",
+      autoParsePdf: true
+    },
+    aiAssistant: {
+      agentName: "Chloe (Dental Care Coordinator)",
+      avatar: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=250&q=80",
+      primaryModel: "gpt-4o",
+      systemPrompt:
+        "You are Chloe, patient care coordinator for BrightSmile Dental. Help patients schedule cleanings, check dental PPO insurance coverage, and handle toothache emergencies.",
+      greetingMessage:
+        "Hi there! Welcome to BrightSmile Dental! I'm Chloe. I can help book your next dental appointment, verify insurance benefits, or answer treatment questions.",
+      handoffScoreThreshold: 80,
+      escalationRole: "Front Desk Supervisor"
+    },
+    integrations: {
+      salesforce: false,
+      hubspot: true,
+      slack: true,
+      slackChannel: "#dental-appointments",
+      webhookUrl: "https://api.brightsmiledental.com/v1/dentrix/intake",
+      snowflake: false,
+      connectedMap: {
+        hubspot: true,
+        whatsapp: true
+      }
+    }
   },
-  integrations: {
-    salesforce: true,
-    salesforceOrgId: "00D80000000hYxE",
-    hubspot: true,
-    slack: true,
-    slackChannel: "#lead-intake-alerts",
-    webhookUrl: "https://api.antelier.io/v1/webhooks/intake",
-    snowflake: true
+  "Financial Services": {
+    activePreset: "Financial Services",
+    businessProfile: {
+      companyName: "Vanguard Wealth Partners",
+      industry: "Financial Planning & Wealth Management",
+      companySize: "500 - 1,000",
+      targetTier: "High Net Worth Individuals ($1M+ Investable Assets)",
+      brandTone: "direct",
+      primaryIntakeGoal: "Qualify accredited investor status, execute KYC/AML checks, and assign wealth advisors",
+      supportEmail: "intake@vanguardwealth.com"
+    },
+    knowledgeBase: {
+      sourcesCount: 7,
+      uploadedFiles: [
+        "FINRA_KYC_AML_Compliance_Manual_2026.pdf",
+        "Accredited_Investor_Verification_SOP.pdf",
+        "Portfolio_Management_Fee_Schedule.pdf"
+      ],
+      scrapeUrls: ["https://vanguardwealth.com/services", "https://vanguardwealth.com/compliance"],
+      syncInterval: "realtime",
+      autoParsePdf: true
+    },
+    aiAssistant: {
+      agentName: "Marcus (Wealth Intake Specialist)",
+      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=250&q=80",
+      primaryModel: "gpt-4o",
+      systemPrompt:
+        "You are Marcus, financial intake analyst at Vanguard Wealth Partners. Assess prospective client investable assets, verify accredited investor qualifications, and schedule initial portfolio consultations.",
+      greetingMessage:
+        "Welcome to Vanguard Wealth Partners. I am Marcus, your wealth intake specialist. I can assist with evaluating portfolio goals, verifying investor accreditation, and connecting you with a Private Wealth Advisor.",
+      handoffScoreThreshold: 88,
+      escalationRole: "Managing Director"
+    },
+    integrations: {
+      salesforce: true,
+      salesforceOrgId: "00D80000000wealth",
+      hubspot: false,
+      slack: true,
+      slackChannel: "#wealth-intake-leads",
+      webhookUrl: "https://api.vanguardwealth.com/v1/charles-schwab/sync",
+      snowflake: true,
+      connectedMap: {
+        salesforce: true,
+        slack: true,
+        snowflake: true
+      }
+    }
+  },
+  "Real Estate": {
+    activePreset: "Real Estate",
+    businessProfile: {
+      companyName: "Prestige Luxury Properties",
+      industry: "Real Estate & Commercial Brokerage",
+      companySize: "100 - 250",
+      targetTier: "Luxury Homebuyers & Commercial Real Estate Investors",
+      brandTone: "friendly",
+      primaryIntakeGoal: "Qualify buyer budget & mortgage pre-approval, schedule property viewings, and log seller listings",
+      supportEmail: "concierge@prestigeproperties.com"
+    },
+    knowledgeBase: {
+      sourcesCount: 5,
+      uploadedFiles: [
+        "Luxury_Listing_Portfolio_2026.pdf",
+        "Mortgage_PreApproval_Requirements.pdf",
+        "Commercial_Lease_Intake_Form.pdf"
+      ],
+      scrapeUrls: ["https://prestigeproperties.com/listings", "https://prestigeproperties.com/agents"],
+      syncInterval: "hourly",
+      autoParsePdf: true
+    },
+    aiAssistant: {
+      agentName: "Sophia (Property Concierge)",
+      avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=250&q=80",
+      primaryModel: "claude-3.5-sonnet",
+      systemPrompt:
+        "You are Sophia, luxury real estate concierge for Prestige Properties. Qualify buyer budget, preferred locations, pre-approval status, and schedule private villa viewings.",
+      greetingMessage:
+        "Hello! Welcome to Prestige Luxury Properties. I'm Sophia, your personal real estate concierge. I can help curate exclusive property listings, arrange private viewings, or connect you with a senior broker.",
+      handoffScoreThreshold: 82,
+      escalationRole: "Lead Listing Agent"
+    },
+    integrations: {
+      salesforce: true,
+      salesforceOrgId: "00D80000000realty",
+      hubspot: true,
+      slack: true,
+      slackChannel: "#luxury-property-inquiries",
+      webhookUrl: "https://api.prestigeproperties.com/v1/mls/webhook",
+      snowflake: false,
+      connectedMap: {
+        hubspot: true,
+        gmail: true,
+        whatsapp: true
+      }
+    }
   }
 }
 
+export const emptyWorkspaceState: WorkspaceState = {
+  activePreset: "Healthcare",
+  isOnboarded: false,
+  showWizardModal: false,
+  currentStep: 1,
+  skippedSteps: [],
+  businessProfile: {
+    companyName: "",
+    industry: "Enterprise Software & AI",
+    companySize: "",
+    targetTier: "",
+    brandTone: "consultative",
+    primaryIntakeGoal: "",
+    supportEmail: ""
+  },
+  knowledgeBase: {
+    sourcesCount: 0,
+    uploadedFiles: [],
+    scrapeUrls: [],
+    syncInterval: "realtime",
+    autoParsePdf: true
+  },
+  aiAssistant: {
+    agentName: "",
+    avatar: "",
+    primaryModel: "gpt-4o",
+    systemPrompt: "",
+    greetingMessage: "",
+    handoffScoreThreshold: 80,
+    escalationRole: ""
+  },
+  integrations: {
+    salesforce: false,
+    hubspot: false,
+    slack: false,
+    webhookUrl: "",
+    snowflake: false,
+    connectedMap: {},
+    accountsMap: {},
+    configsMap: {},
+    lastSyncMap: {}
+  }
+}
+
+const defaultState: WorkspaceState = emptyWorkspaceState
+
 interface WorkspaceContextType {
   state: WorkspaceState
+  loadDemoPreset: (presetName: DemoPresetType) => void
   updateBusinessProfile: (data: Partial<BusinessProfileData>) => void
   updateKnowledgeBase: (data: Partial<KnowledgeBaseData>) => void
   updateAiAssistant: (data: Partial<AiAssistantData>) => void
   updateIntegrations: (data: Partial<IntegrationsData>) => void
+  connectIntegration: (id: string, accountName: string, config?: Record<string, string>) => void
+  updateIntegrationConfig: (id: string, config: Record<string, string>) => void
+  disconnectIntegration: (id: string) => void
+  isIntegrationConnected: (id: string) => boolean
+  getIntegrationAccount: (id: string) => string
+  getIntegrationConfig: (id: string) => Record<string, string>
   setCurrentStep: (step: number) => void
+  skipStep: (stepNumber: number) => void
+  unskipStep: (stepNumber: number) => void
   skipWizard: () => void
   completeWizard: () => void
   openWizard: () => void
@@ -143,26 +435,53 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
   }, [state, isHydrated])
 
   const completionPercentage = React.useMemo(() => {
-    let score = 0
-    if (state.businessProfile.companyName) score += 10
-    if (state.businessProfile.industry) score += 10
-    if (state.businessProfile.primaryIntakeGoal) score += 5
+    let count = 0
+    if (state.businessProfile?.companyName?.trim?.() && state.businessProfile?.primaryIntakeGoal?.trim?.()) count++
+    if ((state.knowledgeBase?.uploadedFiles?.length || 0) > 0 || (state.knowledgeBase?.scrapeUrls?.length || 0) > 0) count++
+    if (state.aiAssistant?.agentName?.trim?.() && state.aiAssistant?.systemPrompt?.trim?.()) count++
+    
+    const hasConnected =
+      Boolean(state.integrations?.hubspot) ||
+      Boolean(typeof state.integrations?.webhookUrl === "string" && state.integrations.webhookUrl.trim()) ||
+      Boolean(state.integrations?.connectedMap && Object.values(state.integrations.connectedMap).some(Boolean))
 
-    if (state.knowledgeBase.uploadedFiles.length > 0) score += 15
-    if (state.knowledgeBase.scrapeUrls.length > 0) score += 10
+    if (hasConnected) count++
+    if (count === 4) count++
 
-    if (state.aiAssistant.agentName) score += 10
-    if (state.aiAssistant.systemPrompt) score += 15
-
-    if (state.integrations.salesforce || state.integrations.hubspot) score += 15
-    if (state.integrations.slack || state.integrations.webhookUrl) score += 10
-
-    return Math.min(100, score)
+    return Math.round((count / 5) * 100)
   }, [state])
+
+  const loadDemoPreset = (presetName: DemoPresetType) => {
+    const preset = demoPresetsData[presetName]
+    if (preset) {
+      setState((prev) => ({
+        ...prev,
+        ...preset,
+        isOnboarded: true,
+      }))
+    }
+  }
+
+  const skipStep = (stepNumber: number) => {
+    setState((prev) => ({
+      ...prev,
+      skippedSteps: (prev.skippedSteps || []).includes(stepNumber)
+        ? prev.skippedSteps || []
+        : [...(prev.skippedSteps || []), stepNumber],
+    }))
+  }
+
+  const unskipStep = (stepNumber: number) => {
+    setState((prev) => ({
+      ...prev,
+      skippedSteps: (prev.skippedSteps || []).filter((s) => s !== stepNumber),
+    }))
+  }
 
   const updateBusinessProfile = (data: Partial<BusinessProfileData>) => {
     setState((prev) => ({
       ...prev,
+      skippedSteps: (prev.skippedSteps || []).filter((s) => s !== 1),
       businessProfile: { ...prev.businessProfile, ...data }
     }))
   }
@@ -170,6 +489,7 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
   const updateKnowledgeBase = (data: Partial<KnowledgeBaseData>) => {
     setState((prev) => ({
       ...prev,
+      skippedSteps: (prev.skippedSteps || []).filter((s) => s !== 2),
       knowledgeBase: { ...prev.knowledgeBase, ...data }
     }))
   }
@@ -177,6 +497,7 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
   const updateAiAssistant = (data: Partial<AiAssistantData>) => {
     setState((prev) => ({
       ...prev,
+      skippedSteps: (prev.skippedSteps || []).filter((s) => s !== 3),
       aiAssistant: { ...prev.aiAssistant, ...data }
     }))
   }
@@ -184,8 +505,82 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
   const updateIntegrations = (data: Partial<IntegrationsData>) => {
     setState((prev) => ({
       ...prev,
+      skippedSteps: (prev.skippedSteps || []).filter((s) => s !== 4),
       integrations: { ...prev.integrations, ...data }
     }))
+  }
+
+  const connectIntegration = (id: string, accountName: string, config?: Record<string, string>) => {
+    setState((prev) => {
+      const currentConnectedMap = prev.integrations.connectedMap || {}
+      const currentAccountsMap = prev.integrations.accountsMap || {}
+      const currentConfigsMap = prev.integrations.configsMap || {}
+      const currentLastSyncMap = prev.integrations.lastSyncMap || {}
+
+      return {
+        ...prev,
+        skippedSteps: (prev.skippedSteps || []).filter((s) => s !== 4),
+        integrations: {
+          ...prev.integrations,
+          hubspot: id === "hubspot" ? true : prev.integrations.hubspot,
+          connectedMap: { ...currentConnectedMap, [id]: true },
+          accountsMap: { ...currentAccountsMap, [id]: accountName },
+          configsMap: { ...currentConfigsMap, [id]: { ...(currentConfigsMap[id] || {}), ...(config || {}) } },
+          lastSyncMap: { ...currentLastSyncMap, [id]: "Just now" }
+        }
+      }
+    })
+  }
+
+  const updateIntegrationConfig = (id: string, config: Record<string, string>) => {
+    setState((prev) => {
+      const currentConfigsMap = prev.integrations.configsMap || {}
+      return {
+        ...prev,
+        integrations: {
+          ...prev.integrations,
+          configsMap: {
+            ...currentConfigsMap,
+            [id]: { ...(currentConfigsMap[id] || {}), ...config }
+          }
+        }
+      }
+    })
+  }
+
+  const disconnectIntegration = (id: string) => {
+    setState((prev) => {
+      const currentConnectedMap = prev.integrations.connectedMap || {}
+      return {
+        ...prev,
+        integrations: {
+          ...prev.integrations,
+          hubspot: id === "hubspot" ? false : prev.integrations.hubspot,
+          connectedMap: { ...currentConnectedMap, [id]: false }
+        }
+      }
+    })
+  }
+
+  const isIntegrationConnected = (id: string) => {
+    if (state.integrations?.connectedMap && state.integrations.connectedMap[id] !== undefined) {
+      return Boolean(state.integrations.connectedMap[id])
+    }
+    // Fallbacks
+    if (id === "hubspot") return Boolean(state.integrations?.hubspot)
+    if (id === "gmail") return Boolean(typeof state.integrations?.webhookUrl === "string" && state.integrations.webhookUrl.trim())
+    return false
+  }
+
+  const getIntegrationAccount = (id: string) => {
+    if (state.integrations.accountsMap?.[id]) {
+      return state.integrations.accountsMap[id]
+    }
+    return `${currentUser.email}`
+  }
+
+  const getIntegrationConfig = (id: string) => {
+    return state.integrations.configsMap?.[id] || {}
   }
 
   const setCurrentStep = (step: number) => {
@@ -232,12 +627,24 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
   return (
     <WorkspaceContext.Provider
       value={{
-        state,
+        state: {
+          ...state,
+          skippedSteps: state.skippedSteps || []
+        },
+        loadDemoPreset,
         updateBusinessProfile,
         updateKnowledgeBase,
         updateAiAssistant,
         updateIntegrations,
+        connectIntegration,
+        updateIntegrationConfig,
+        disconnectIntegration,
+        isIntegrationConnected,
+        getIntegrationAccount,
+        getIntegrationConfig,
         setCurrentStep,
+        skipStep,
+        unskipStep,
         skipWizard,
         completeWizard,
         openWizard,
@@ -258,3 +665,4 @@ export function useWorkspace() {
   }
   return context
 }
+

@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useTheme } from "next-themes"
-import { Sun, Moon, Laptop } from "lucide-react"
+import { Sun, Moon } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 export function ThemeSwitcher({ className }: { className?: string }) {
@@ -20,13 +20,7 @@ export function ThemeSwitcher({ className }: { className?: string }) {
   }
 
   const toggleTheme = () => {
-    if (theme === "dark") {
-      setTheme("light")
-    } else if (theme === "light") {
-      setTheme("system")
-    } else {
-      setTheme("dark")
-    }
+    setTheme(theme === "dark" ? "light" : "dark")
   }
 
   return (
@@ -34,17 +28,15 @@ export function ThemeSwitcher({ className }: { className?: string }) {
       type="button"
       onClick={toggleTheme}
       className={cn(
-        "relative flex h-8 w-8 items-center justify-center rounded-lg border border-border/60 bg-background hover:bg-muted/60 text-muted-foreground hover:text-foreground transition-all shadow-2xs focus:outline-none focus:ring-2 focus:ring-ring",
+        "relative flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-border/60 bg-background text-muted-foreground shadow-2xs transition-all hover:bg-muted/60 hover:text-foreground focus:ring-2 focus:ring-ring focus:outline-none",
         className
       )}
-      title={`Current theme: ${theme}. Click to change (HotKey: D)`}
+      title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
     >
       {theme === "dark" ? (
         <Moon className="h-4 w-4 text-purple-400 transition-all" />
-      ) : theme === "light" ? (
-        <Sun className="h-4 w-4 text-amber-500 transition-all" />
       ) : (
-        <Laptop className="h-4 w-4 text-blue-500 transition-all" />
+        <Sun className="h-4 w-4 text-amber-500 transition-all" />
       )}
       <span className="sr-only">Toggle theme</span>
     </button>

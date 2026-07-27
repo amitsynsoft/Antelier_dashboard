@@ -1,23 +1,48 @@
 "use client"
 
 import * as React from "react"
-import { useWorkspace } from "@/context/workspace-context"
-import { FileText, UploadCloud, Link as LinkIcon, Trash2, Plus, CheckCircle2, RefreshCw } from "lucide-react"
+import { useWorkspace, KnowledgeBaseData } from "@/context/workspace-context"
+import { FileUploader } from "@/components/ui/file-uploader"
+import { notify } from "@/lib/toast"
+import {
+  FileText,
+  Link as LinkIcon,
+  Trash2,
+  Plus,
+  CheckCircle2,
+  Check,
+} from "lucide-react"
 
 interface KnowledgeBaseFormProps {
   onSavedNotice?: () => void
   showTitle?: boolean
 }
 
-export function KnowledgeBaseForm({ onSavedNotice, showTitle = false }: KnowledgeBaseFormProps) {
+export function KnowledgeBaseForm({
+  onSavedNotice,
+  showTitle = false,
+}: KnowledgeBaseFormProps) {
   const { state, updateKnowledgeBase } = useWorkspace()
   const data = state.knowledgeBase
   const [newUrl, setNewUrl] = React.useState("")
 
+  const handleFilesChange = (fileNames: string[]) => {
+    updateKnowledgeBase({
+      uploadedFiles: fileNames,
+      sourcesCount: fileNames.length + data.scrapeUrls.length,
+    })
+  }
+
   const handleAddUrl = () => {
     if (newUrl.trim()) {
       const updated = [...data.scrapeUrls, newUrl.trim()]
-      updateKnowledgeBase({ scrapeUrls: updated, sourcesCount: data.uploadedFiles.length + updated.length })
+      updateKnowledgeBase({
+        scrapeUrls: updated,
+        sourcesCount: data.uploadedFiles.length + updated.length,
+      })
+      notify.success("Documentation URL added!", {
+        description: `Active web scraper target: ${newUrl.trim()}`,
+      })
       setNewUrl("")
       onSavedNotice?.()
     }
@@ -25,130 +50,94 @@ export function KnowledgeBaseForm({ onSavedNotice, showTitle = false }: Knowledg
 
   const handleRemoveUrl = (url: string) => {
     const updated = data.scrapeUrls.filter((u) => u !== url)
-    updateKnowledgeBase({ scrapeUrls: updated, sourcesCount: data.uploadedFiles.length + updated.length })
+    updateKnowledgeBase({
+      scrapeUrls: updated,
+      sourcesCount: data.uploadedFiles.length + updated.length,
+    })
+    notify.info("Web scraper URL removed", {
+      description: url,
+    })
     onSavedNotice?.()
-  }
-
-  const handleRemoveFile = (file: string) => {
-    const updated = data.uploadedFiles.filter((f) => f !== file)
-    updateKnowledgeBase({ uploadedFiles: updated, sourcesCount: updated.length + data.scrapeUrls.length })
-    onSavedNotice?.()
-  }
-
-  const handleFileUploadMock = () => {
-    const sampleFiles = [
-      "Enterprise_SOC2_Compliance_Report.pdf",
-      "SLA_Guarantee_Addendum_2026.pdf",
-      "API_Endpoint_Schema_v2.json"
-    ]
-    const nextFile = sampleFiles[data.uploadedFiles.length % sampleFiles.length]
-    if (!data.uploadedFiles.includes(nextFile)) {
-      const updated = [...data.uploadedFiles, nextFile]
-      updateKnowledgeBase({ uploadedFiles: updated, sourcesCount: updated.length + data.scrapeUrls.length })
-      onSavedNotice?.()
-    }
   }
 
   return (
     <div className="space-y-6">
       {showTitle && (
-        <div className="space-y-1 pb-4 border-b border-border/50">
-          <h2 className="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
+        <div className="space-y-1 border-b border-border/50 pb-4">
+          <h2 className="flex items-center gap-2 text-xl font-bold tracking-tight text-foreground">
             <FileText className="h-5 w-5 text-primary" />
             Knowledge Base & Data Ingestion
           </h2>
-          <p className="text-xs text-muted-foreground">
-            Feed your AI intake agents with enterprise whitepapers, security collateral, and RFP documentation.
+          <p className="text-sm text-muted-foreground">
+            Feed your AI intake agents with enterprise whitepapers, security
+            collateral, and RFP documentation.
           </p>
         </div>
       )}
 
-      {/* File Upload Dropzone */}
+      {/* Enterprise Reusable FileUploader Suite */}
       <div className="space-y-2">
-        <label className="text-xs font-semibold text-foreground">Upload Security & Product Collateral</label>
-        <div
-          onClick={handleFileUploadMock}
-          className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-border/80 rounded-xl bg-muted/20 hover:bg-muted/40 transition-colors cursor-pointer text-center group"
-        >
-          <div className="p-3 rounded-full bg-primary/10 text-primary group-hover:scale-110 transition-transform mb-2">
-            <UploadCloud className="h-6 w-6" />
-          </div>
-          <span className="text-xs font-bold text-foreground">Click to upload collateral files</span>
-          <span className="text-[11px] text-muted-foreground mt-0.5">Supports PDF, DOCX, CSV, JSON (Up to 50MB per file)</span>
-        </div>
+        <label className="text-sm font-semibold text-foreground">
+          Upload Security & Product Collateral
+        </label>
 
-        {/* Uploaded Files List */}
-        {data.uploadedFiles.length > 0 && (
-          <div className="space-y-2 pt-2">
-            <span className="text-[11px] font-mono uppercase font-semibold text-muted-foreground">
-              Uploaded Documents ({data.uploadedFiles.length})
-            </span>
-            <div className="space-y-1.5">
-              {data.uploadedFiles.map((file, idx) => (
-                <div
-                  key={idx}
-                  className="flex items-center justify-between p-2.5 rounded-lg border border-border/60 bg-card text-xs"
-                >
-                  <div className="flex items-center gap-2 truncate">
-                    <FileText className="h-4 w-4 text-primary shrink-0" />
-                    <span className="font-semibold text-foreground truncate">{file}</span>
-                    <span className="px-1.5 py-0.2 text-[9px] font-mono rounded bg-emerald-500/10 text-emerald-500">
-                      Vectorized
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveFile(file)}
-                    className="p-1 text-muted-foreground hover:text-rose-500 transition-colors"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        <FileUploader
+          mode="multiple"
+          maxSizeMB={50}
+          maxFiles={15}
+          value={data.uploadedFiles}
+          onFilesChange={handleFilesChange}
+          onUploadComplete={(name) => {
+            notify.success(`Document indexed!`, {
+              description: `"${name}" processed & added to vector store.`,
+            })
+          }}
+        />
       </div>
 
       {/* Website & Documentation Web Scrapers */}
-      <div className="space-y-2 pt-2 border-t border-border/40">
-        <label className="text-xs font-semibold text-foreground">Active Documentation Scraping URLs</label>
-        <div className="flex gap-2">
+      <div className="space-y-2 border-t border-border/40 pt-3">
+        <label className="text-sm font-semibold text-foreground">
+          Active Documentation Scraping URLs
+        </label>
+        <div className="flex gap-2.5">
           <input
             type="url"
             value={newUrl}
             onChange={(e) => setNewUrl(e.target.value)}
             placeholder="https://yourcompany.com/docs"
-            className="flex-1 h-9 px-3 text-xs bg-muted/30 border border-input rounded-lg text-foreground focus:ring-2 focus:ring-ring focus:outline-none"
+            className="h-11 flex-1 rounded-xl border border-input bg-muted/30 px-3.5 text-sm text-foreground focus:ring-2 focus:ring-ring focus:outline-none"
           />
           <button
             type="button"
             onClick={handleAddUrl}
-            className="px-3 h-9 text-xs font-semibold rounded-lg bg-primary text-primary-foreground hover:opacity-90 flex items-center gap-1"
+            className="flex h-11 cursor-pointer items-center gap-1.5 rounded-xl bg-primary px-4 text-sm font-bold text-primary-foreground shadow-2xs hover:opacity-90"
           >
-            <Plus className="h-3.5 w-3.5" />
+            <Plus className="h-4 w-4" />
             <span>Add URL</span>
           </button>
         </div>
 
         {/* URL List */}
         {data.scrapeUrls.length > 0 && (
-          <div className="space-y-1.5 pt-2">
+          <div className="space-y-2 pt-2">
             {data.scrapeUrls.map((url, idx) => (
               <div
                 key={idx}
-                className="flex items-center justify-between p-2.5 rounded-lg border border-border/60 bg-card text-xs"
+                className="flex items-center justify-between rounded-xl border border-border/60 bg-card p-3 text-sm"
               >
-                <div className="flex items-center gap-2 truncate">
-                  <LinkIcon className="h-3.5 w-3.5 text-blue-500 shrink-0" />
-                  <span className="font-mono text-muted-foreground truncate">{url}</span>
+                <div className="flex items-center gap-2.5 truncate">
+                  <LinkIcon className="h-4 w-4 shrink-0 text-blue-500" />
+                  <span className="truncate font-mono text-xs text-muted-foreground">
+                    {url}
+                  </span>
                 </div>
                 <button
                   type="button"
                   onClick={() => handleRemoveUrl(url)}
-                  className="p-1 text-muted-foreground hover:text-rose-500 transition-colors"
+                  className="cursor-pointer p-1.5 text-muted-foreground transition-colors hover:text-rose-500"
                 >
-                  <Trash2 className="h-3.5 w-3.5" />
+                  <Trash2 className="h-4 w-4" />
                 </button>
               </div>
             ))}
@@ -157,16 +146,24 @@ export function KnowledgeBaseForm({ onSavedNotice, showTitle = false }: Knowledg
       </div>
 
       {/* Sync Settings */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-border/40">
-        <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-foreground">Vector Index Refresh Frequency</label>
+      <div className="grid grid-cols-1 gap-5 border-t border-border/40 pt-3 sm:grid-cols-2">
+        <div className="space-y-2">
+          <label className="text-sm font-semibold text-foreground">
+            Vector Index Refresh Frequency
+          </label>
           <select
             value={data.syncInterval}
             onChange={(e) => {
-              updateKnowledgeBase({ syncInterval: e.target.value as any })
+              updateKnowledgeBase({
+                syncInterval: e.target
+                  .value as KnowledgeBaseData["syncInterval"],
+              })
+              notify.info("Vector index refresh frequency updated", {
+                description: `Frequency set to: ${e.target.value}`,
+              })
               onSavedNotice?.()
             }}
-            className="w-full h-9 px-3 text-xs bg-muted/30 border border-input rounded-lg text-foreground focus:ring-2 focus:ring-ring focus:outline-none"
+            className="h-11 w-full rounded-xl border border-input bg-muted/30 px-3.5 text-sm text-foreground focus:ring-2 focus:ring-ring focus:outline-none"
           >
             <option value="realtime">Real-time Webhook</option>
             <option value="hourly">Hourly Auto Sync</option>
@@ -175,22 +172,52 @@ export function KnowledgeBaseForm({ onSavedNotice, showTitle = false }: Knowledg
           </select>
         </div>
 
-        <div className="flex items-center justify-between p-3 rounded-lg border border-border/60 bg-muted/20 mt-auto">
+        <div className="mt-auto flex items-center justify-between rounded-xl border border-border/60 bg-muted/20 p-3.5">
           <div className="space-y-0.5">
-            <div className="text-xs font-bold text-foreground">Auto-Parse PDF Tables & OCR</div>
-            <div className="text-[10px] text-muted-foreground">Extract custom SLA tables automatically</div>
+            <div className="text-sm font-bold text-foreground">
+              Auto-Parse PDF Tables & OCR
+            </div>
+            <div className="text-xs text-muted-foreground">
+              Extract custom SLA tables automatically
+            </div>
           </div>
           <input
             type="checkbox"
             checked={data.autoParsePdf}
             onChange={(e) => {
               updateKnowledgeBase({ autoParsePdf: e.target.checked })
+              notify.info("PDF OCR Settings saved", {
+                description: `Auto-parsing ${e.target.checked ? "enabled" : "disabled"}.`,
+              })
               onSavedNotice?.()
             }}
-            className="h-4 w-4 rounded border-input text-primary focus:ring-primary"
+            className="h-5 w-5 cursor-pointer rounded-lg border-input text-primary focus:ring-primary"
           />
         </div>
       </div>
+
+      {!showTitle && (
+        <div className="flex items-center justify-between border-t border-border/50 pt-4">
+          <span className="text-xs text-muted-foreground">
+            Changes auto-saved to workspace vector store.
+          </span>
+          <button
+            type="button"
+            onClick={() => {
+              updateKnowledgeBase({})
+              notify.success("Knowledge Base saved & indexed!", {
+                description: "Vector database status and RAG pipeline updated.",
+              })
+              onSavedNotice?.()
+            }}
+            className="flex cursor-pointer items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-2xs transition-all hover:opacity-90"
+          >
+            <Check className="h-4 w-4" />
+
+            <span>Save Changes</span>
+          </button>
+        </div>
+      )}
     </div>
   )
 }

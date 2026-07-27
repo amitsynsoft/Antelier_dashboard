@@ -4,6 +4,7 @@ import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { AuthProvider } from "@/context/auth-context"
 import { WorkspaceProvider } from "@/context/workspace-context"
+import { GlobalToastProvider } from "@/components/ui/global-toast-provider"
 import { cn } from "@/lib/utils"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
@@ -27,10 +28,12 @@ export const metadata: Metadata = {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
       { url: "/favicon.svg", type: "image/svg+xml" },
-      { url: "/favicon-96x96.png", sizes: "96x96", type: "image/png" }
+      { url: "/favicon-96x96.png", sizes: "96x96", type: "image/png" },
     ],
-    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }]
-  }
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
 }
 
 export default function RootLayout({
@@ -42,13 +45,18 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={cn("antialiased", fontMono.variable, fontSerif.variable, inter.variable)}
+      className={cn(
+        "antialiased",
+        fontMono.variable,
+        fontSerif.variable,
+        inter.variable
+      )}
     >
       <body>
         <ThemeProvider>
           <AuthProvider>
             <WorkspaceProvider>
-              {children}
+              <GlobalToastProvider>{children}</GlobalToastProvider>
             </WorkspaceProvider>
           </AuthProvider>
         </ThemeProvider>
