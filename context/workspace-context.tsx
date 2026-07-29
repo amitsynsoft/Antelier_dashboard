@@ -13,6 +13,8 @@ export type BusinessProfileData = {
   brandTone: "formal" | "consultative" | "direct" | "friendly"
   primaryIntakeGoal: string
   supportEmail: string
+  companyWebsite?: string
+  contactNumber?: string
 }
 
 export type KnowledgeBaseData = {
@@ -33,6 +35,64 @@ export type AiAssistantData = {
   escalationRole: string
 }
 
+export const DEFAULT_PROMPT_STUDIO_BY_INTEGRATION: Record<string, AiAssistantData> = {
+  hubspot: {
+    agentName: "HubSpot Lead Qualifier & CRM Copilot",
+    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80",
+    primaryModel: "gpt-4o",
+    systemPrompt:
+      "You are the HubSpot Lead Qualification Copilot for Aether Health Systems. Qualify inbound prospects by asking about budget, company size, timeline, and key decision makers. Automatically create lead records and score prospects before routing high-intent deals to senior AEs.",
+    greetingMessage:
+      "Hello! Welcome to our enterprise portal. I'm your HubSpot Lead Qualification Assistant. I can answer product questions and connect you directly with a dedicated account manager.",
+    handoffScoreThreshold: 80,
+    escalationRole: "Senior Enterprise Account Executive"
+  },
+  gmail: {
+    agentName: "Gmail Intake & Dispatch Copilot",
+    avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=250&q=80",
+    primaryModel: "claude-3.5-sonnet",
+    systemPrompt:
+      "You are the Gmail Automated Intake Dispatcher. Analyze incoming email threads, extract key customer requests, verify subscriber status, draft structured responses, and flag urgent tickets for human review.",
+    greetingMessage:
+      "Thank you for reaching out via email! Our automated response engine has received your message and prepared immediate intake details for our support desk.",
+    handoffScoreThreshold: 75,
+    escalationRole: "Email Support Triage Manager"
+  },
+  whatsapp: {
+    agentName: "WhatsApp Instant Conversational Assistant",
+    avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=250&q=80",
+    primaryModel: "gpt-4o",
+    systemPrompt:
+      "You are the WhatsApp Business AI Assistant. Engage in fast, concise, multi-lingual intake conversations. Collect prospect contact details, answer service FAQs, and offer instant booking links.",
+    greetingMessage:
+      "Hi there! Welcome to our WhatsApp Business channel. I'm here 24/7 to answer your questions, check appointment slots, or transfer you to a team member.",
+    handoffScoreThreshold: 85,
+    escalationRole: "Live Chat Operations Desk"
+  },
+  voice_agent: {
+    agentName: "Ava (Clinical Intake Copilot)",
+    avatar: "https://images.unsplash.com/photo-1594824813566-88855ce7890b?auto=format&fit=crop&w=250&q=80",
+    primaryModel: "gpt-4o",
+    systemPrompt:
+      "You are Ava, a certified clinical intake coordinator for Aether Health Systems. Verify patient DOB, insurance provider, policy ID, and chief complaint while maintaining strict HIPAA privacy compliance.",
+    greetingMessage:
+      "Hello, welcome to Aether Health Systems! I'm Ava, your virtual clinical intake coordinator. I can help register your patient file, check insurance copays, or schedule a doctor consultation.",
+    handoffScoreThreshold: 85,
+    escalationRole: "Duty Triage Nurse"
+  },
+  gcal: {
+    agentName: "Google Calendar Booking & Scheduling Copilot",
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=250&q=80",
+    primaryModel: "gemini-1.5-pro",
+    systemPrompt:
+      "You are the Google Calendar Scheduling Assistant. Cross-reference team calendar availability, handle time zone conversions, propose open appointment slots, and issue automated calendar invitations.",
+    greetingMessage:
+      "Welcome! Need to book a meeting or consultation? I can inspect real-time calendar availability and secure a convenient slot for you right now.",
+    handoffScoreThreshold: 70,
+    escalationRole: "Scheduling Coordinator"
+  }
+}
+
 export type IntegrationsData = {
   salesforce: boolean
   salesforceOrgId?: string
@@ -41,9 +101,11 @@ export type IntegrationsData = {
   slackChannel?: string
   webhookUrl: string
   snowflake: boolean
+  enabledMap?: Record<string, boolean>
   connectedMap?: Record<string, boolean>
   accountsMap?: Record<string, string>
   configsMap?: Record<string, Record<string, string>>
+  promptStudioMap?: Record<string, AiAssistantData>
   lastSyncMap?: Record<string, string>
 }
 
@@ -346,7 +408,9 @@ export const emptyWorkspaceState: WorkspaceState = {
     targetTier: "",
     brandTone: "consultative",
     primaryIntakeGoal: "",
-    supportEmail: ""
+    supportEmail: "",
+    companyWebsite: "",
+    contactNumber: ""
   },
   knowledgeBase: {
     sourcesCount: 0,
@@ -370,6 +434,7 @@ export const emptyWorkspaceState: WorkspaceState = {
     slack: false,
     webhookUrl: "",
     snowflake: false,
+    enabledMap: {},
     connectedMap: {},
     accountsMap: {},
     configsMap: {},
@@ -390,8 +455,12 @@ interface WorkspaceContextType {
   updateIntegrationConfig: (id: string, config: Record<string, string>) => void
   disconnectIntegration: (id: string) => void
   isIntegrationConnected: (id: string) => boolean
+  isIntegrationEnabled: (id: string) => boolean
+  toggleIntegrationEnabled: (id: string, enabled?: boolean) => void
   getIntegrationAccount: (id: string) => string
   getIntegrationConfig: (id: string) => Record<string, string>
+  getIntegrationPromptStudio: (id: string) => AiAssistantData
+  updateIntegrationPromptStudio: (id: string, data: Partial<AiAssistantData>) => void
   setCurrentStep: (step: number) => void
   skipStep: (stepNumber: number) => void
   unskipStep: (stepNumber: number) => void
@@ -438,7 +507,6 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     let count = 0
     if (state.businessProfile?.companyName?.trim?.() && state.businessProfile?.primaryIntakeGoal?.trim?.()) count++
     if ((state.knowledgeBase?.uploadedFiles?.length || 0) > 0 || (state.knowledgeBase?.scrapeUrls?.length || 0) > 0) count++
-    if (state.aiAssistant?.agentName?.trim?.() && state.aiAssistant?.systemPrompt?.trim?.()) count++
     
     const hasConnected =
       Boolean(state.integrations?.hubspot) ||
@@ -446,9 +514,8 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
       Boolean(state.integrations?.connectedMap && Object.values(state.integrations.connectedMap).some(Boolean))
 
     if (hasConnected) count++
-    if (count === 4) count++
 
-    return Math.round((count / 5) * 100)
+    return Math.round((count / 3) * 100)
   }, [state])
 
   const loadDemoPreset = (presetName: DemoPresetType) => {
@@ -516,17 +583,44 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
       const currentAccountsMap = prev.integrations.accountsMap || {}
       const currentConfigsMap = prev.integrations.configsMap || {}
       const currentLastSyncMap = prev.integrations.lastSyncMap || {}
+      const currentEnabledMap = prev.integrations.enabledMap || {}
 
       return {
         ...prev,
-        skippedSteps: (prev.skippedSteps || []).filter((s) => s !== 4),
+        skippedSteps: (prev.skippedSteps || []).filter((s) => s !== 3),
         integrations: {
           ...prev.integrations,
           hubspot: id === "hubspot" ? true : prev.integrations.hubspot,
+          enabledMap: { ...currentEnabledMap, [id]: true },
           connectedMap: { ...currentConnectedMap, [id]: true },
           accountsMap: { ...currentAccountsMap, [id]: accountName },
           configsMap: { ...currentConfigsMap, [id]: { ...(currentConfigsMap[id] || {}), ...(config || {}) } },
           lastSyncMap: { ...currentLastSyncMap, [id]: "Just now" }
+        }
+      }
+    })
+  }
+
+  const isIntegrationEnabled = (id: string) => {
+    if (state.integrations?.enabledMap && state.integrations.enabledMap[id] !== undefined) {
+      return Boolean(state.integrations.enabledMap[id])
+    }
+    return false
+  }
+
+  const toggleIntegrationEnabled = (id: string, enabled?: boolean) => {
+    setState((prev) => {
+      const currentEnabledMap = prev.integrations.enabledMap || {}
+      const nextState = enabled !== undefined ? enabled : !currentEnabledMap[id]
+      return {
+        ...prev,
+        skippedSteps: (prev.skippedSteps || []).filter((s) => s !== 3),
+        integrations: {
+          ...prev.integrations,
+          enabledMap: {
+            ...currentEnabledMap,
+            [id]: nextState
+          }
         }
       }
     })
@@ -581,6 +675,36 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
 
   const getIntegrationConfig = (id: string) => {
     return state.integrations.configsMap?.[id] || {}
+  }
+
+  const getIntegrationPromptStudio = (id: string): AiAssistantData => {
+    if (state.integrations.promptStudioMap?.[id]) {
+      return state.integrations.promptStudioMap[id]
+    }
+    if (DEFAULT_PROMPT_STUDIO_BY_INTEGRATION[id]) {
+      return DEFAULT_PROMPT_STUDIO_BY_INTEGRATION[id]
+    }
+    return state.aiAssistant
+  }
+
+  const updateIntegrationPromptStudio = (id: string, data: Partial<AiAssistantData>) => {
+    setState((prev) => {
+      const currentPromptMap = prev.integrations.promptStudioMap || {}
+      const existing = currentPromptMap[id] || DEFAULT_PROMPT_STUDIO_BY_INTEGRATION[id] || prev.aiAssistant
+      const updated = { ...existing, ...data }
+
+      return {
+        ...prev,
+        aiAssistant: id === "voice_agent" || id === "hubspot" ? { ...prev.aiAssistant, ...data } : prev.aiAssistant,
+        integrations: {
+          ...prev.integrations,
+          promptStudioMap: {
+            ...currentPromptMap,
+            [id]: updated
+          }
+        }
+      }
+    })
   }
 
   const setCurrentStep = (step: number) => {
@@ -640,8 +764,12 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
         updateIntegrationConfig,
         disconnectIntegration,
         isIntegrationConnected,
+        isIntegrationEnabled,
+        toggleIntegrationEnabled,
         getIntegrationAccount,
         getIntegrationConfig,
+        getIntegrationPromptStudio,
+        updateIntegrationPromptStudio,
         setCurrentStep,
         skipStep,
         unskipStep,

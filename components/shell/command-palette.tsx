@@ -75,7 +75,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
     { title: "Open Visual Workflow Builder", category: "Navigation", icon: GitFork, action: () => handleAction("navigate", "/workflows") },
     { title: "Go to Business Profile", category: "Navigation", icon: Building2, action: () => handleAction("navigate", "/business-profile") },
     { title: "Open Knowledge Base & Documents", category: "Navigation", icon: FileText, action: () => handleAction("navigate", "/knowledge-base") },
-    { title: "Open Prompt Studio", category: "Navigation", icon: Sliders, action: () => handleAction("navigate", "/prompt-studio") },
+    { title: "Open Prompt Studio (Integrations)", category: "Navigation", icon: Sliders, action: () => handleAction("navigate", "/integrations") },
     { title: "Open Integrations & Webhooks", category: "Navigation", icon: Plug, action: () => handleAction("navigate", "/integrations") },
     { title: "Open Users & Permissions", category: "Navigation", icon: Users, action: () => handleAction("navigate", "/users") },
 

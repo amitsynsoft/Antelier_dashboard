@@ -59,8 +59,8 @@ export function AiAssistantOverviewCard() {
           <span className="font-semibold text-foreground truncate max-w-[150px]">{bp.industry || "Enterprise"}</span>
         </div>
         <div className="py-2.5 flex items-center justify-between">
-          <span className="text-muted-foreground">Handoff Threshold</span>
-          <span className="font-semibold text-primary font-mono">{ai.handoffScoreThreshold} / 100</span>
+          <span className="text-muted-foreground">Primary Model</span>
+          <span className="font-semibold text-primary font-mono">{ai.primaryModel || "gpt-4o"}</span>
         </div>
         <div className="py-2.5 flex items-center justify-between">
           <span className="text-muted-foreground">System Prompt</span>
@@ -72,7 +72,7 @@ export function AiAssistantOverviewCard() {
 
       {/* Footer CTA Button */}
       <a
-        href="#prompt-studio"
+        href="/integrations"
         className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-primary/30 bg-primary/10 px-4 py-2.5 text-xs sm:text-sm font-semibold text-primary shadow-2xs hover:bg-primary hover:text-primary-foreground transition-all"
       >
         <span>Edit Prompt Studio</span>

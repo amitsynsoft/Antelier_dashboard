@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { Sliders, X, Plus, Sparkles, Check } from "lucide-react"
+import { Select } from "@/components/ui/select"
 import { notify } from "@/lib/toast"
 import { IntentWorkflow } from "../types"
 
@@ -64,17 +65,15 @@ export function WorkflowIntentEditor({
           <label className="text-sm font-semibold text-foreground">
             Fallback Workflow Handoff
           </label>
-          <select
+          <Select
             value={workflow.fallbackWorkflow}
-            onChange={(e) =>
-              onUpdateWorkflow({ fallbackWorkflow: e.target.value })
-            }
-            className="h-11 w-full rounded-xl border border-input bg-muted/30 px-3.5 text-sm text-foreground focus:ring-2 focus:ring-orange-500 focus:outline-none"
-          >
-            <option value="General Inquiry">General Inquiry</option>
-            <option value="Support Escalation">Support Escalation</option>
-            <option value="Human Transfer">Human Transfer to AE</option>
-          </select>
+            onChange={(val) => onUpdateWorkflow({ fallbackWorkflow: val })}
+            options={[
+              { value: "General Inquiry", label: "General Inquiry" },
+              { value: "Support Escalation", label: "Support Escalation" },
+              { value: "Human Transfer", label: "Human Transfer to AE" },
+            ]}
+          />
         </div>
       </div>
 

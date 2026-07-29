@@ -120,7 +120,7 @@ export default function LoginPage() {
           <div className="space-y-3 rounded-2xl border border-primary/30 bg-primary/5 p-4">
             <span className="flex items-center gap-1.5 font-mono text-xs font-bold tracking-wider text-primary uppercase">
               <Sparkles className="h-4 w-4" />
-              Sales Demo Persona Switcher
+              Demo Persona Switcher
             </span>
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               <button

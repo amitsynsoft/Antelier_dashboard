@@ -5,13 +5,11 @@ import { motion } from "framer-motion"
 import { useWorkspace } from "@/context/workspace-context"
 import { BusinessProfileForm } from "@/components/forms/business-profile-form"
 import { KnowledgeBaseForm } from "@/components/forms/knowledge-base-form"
-import { AiAssistantForm } from "@/components/forms/ai-assistant-form"
 import { IntegrationsForm } from "@/components/forms/integrations-form"
 import {
   Sparkles,
   Building2,
   FileText,
-  Bot,
   Grid,
   CheckCircle2,
   ArrowRight,
@@ -46,13 +44,12 @@ export function WorkspaceWizard() {
   const steps = [
     { number: 1, title: "Business Profile", icon: Building2 },
     { number: 2, title: "Knowledge Base", icon: FileText },
-    { number: 3, title: "AI Assistant", icon: Bot },
-    { number: 4, title: "Integrations", icon: Grid },
-    { number: 5, title: "Finish", icon: CheckCircle2 }
+    { number: 3, title: "Integrations", icon: Grid },
+    { number: 4, title: "Finish", icon: CheckCircle2 }
   ]
 
   const nextStep = () => {
-    if (state.currentStep < 5) {
+    if (state.currentStep < 4) {
       setCurrentStep(state.currentStep + 1)
     } else {
       completeWizard()
@@ -178,12 +175,9 @@ export function WorkspaceWizard() {
               <KnowledgeBaseForm onSavedNotice={handleSavedNotice} showTitle />
             )}
             {state.currentStep === 3 && (
-              <AiAssistantForm onSavedNotice={handleSavedNotice} showTitle />
-            )}
-            {state.currentStep === 4 && (
               <IntegrationsForm onSavedNotice={handleSavedNotice} showTitle />
             )}
-            {state.currentStep === 5 && (
+            {state.currentStep === 4 && (
               <div className="space-y-6 text-center py-4">
                 <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-500 ring-2 ring-emerald-500/20 shadow-inner mx-auto">
                   <ShieldCheck className="h-8 w-8" />
@@ -199,8 +193,8 @@ export function WorkspaceWizard() {
                 </div>
 
                 {/* Progress Summary Cards */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-left pt-4 max-w-2xl mx-auto">
-                  <div className="p-3 rounded-xl border border-border/60 bg-muted/20">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-left pt-4 max-w-xl mx-auto">
+                  <div className="p-3.5 rounded-xl border border-border/60 bg-muted/20">
                     <span className="text-xs uppercase font-mono font-bold text-muted-foreground tracking-wider">Business Profile</span>
                     <div className="text-sm font-bold text-foreground truncate mt-0.5">
                       {state.skippedSteps.includes(1) ? (
@@ -212,7 +206,7 @@ export function WorkspaceWizard() {
                       )}
                     </div>
                   </div>
-                  <div className="p-3 rounded-xl border border-border/60 bg-muted/20">
+                  <div className="p-3.5 rounded-xl border border-border/60 bg-muted/20">
                     <span className="text-xs uppercase font-mono font-bold text-muted-foreground tracking-wider">Knowledge Base</span>
                     <div className="text-sm font-bold text-foreground truncate mt-0.5">
                       {state.skippedSteps.includes(2) ? (
@@ -224,31 +218,15 @@ export function WorkspaceWizard() {
                       )}
                     </div>
                   </div>
-                  <div className="p-3 rounded-xl border border-border/60 bg-muted/20">
-                    <span className="text-xs uppercase font-mono font-bold text-muted-foreground tracking-wider">AI Model</span>
+                  <div className="p-3.5 rounded-xl border border-border/60 bg-muted/20">
+                    <span className="text-xs uppercase font-mono font-bold text-muted-foreground tracking-wider">Connectors</span>
                     <div className="text-sm font-bold text-foreground truncate mt-0.5">
                       {state.skippedSteps.includes(3) ? (
                         <span className="text-amber-600 dark:text-amber-400 font-medium">Skipped</span>
-                      ) : state.aiAssistant.agentName ? (
-                        state.aiAssistant.primaryModel
+                      ) : state.integrations.enabledMap ? (
+                        `${Object.values(state.integrations.enabledMap).filter(Boolean).length} Enabled`
                       ) : (
-                        <span className="text-muted-foreground">Not Configured</span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="p-3 rounded-xl border border-border/60 bg-muted/20">
-                    <span className="text-xs uppercase font-mono font-bold text-muted-foreground tracking-wider">Connectors</span>
-                    <div className="text-sm font-bold text-foreground truncate mt-0.5">
-                      {state.skippedSteps.includes(4) ? (
-                        <span className="text-amber-600 dark:text-amber-400 font-medium">Skipped</span>
-                      ) : (
-                        state.integrations.hubspot ||
-                        Boolean(typeof state.integrations.webhookUrl === "string" && state.integrations.webhookUrl.trim()) ||
-                        Boolean(state.integrations.connectedMap && Object.values(state.integrations.connectedMap).some(Boolean))
-                      ) ? (
-                        "Connected"
-                      ) : (
-                        <span className="text-muted-foreground">Not Configured</span>
+                        "4 Enabled"
                       )}
                     </div>
                   </div>
@@ -272,10 +250,10 @@ export function WorkspaceWizard() {
 
           <div className="flex items-center gap-3">
             <span className="text-xs text-muted-foreground font-mono hidden sm:inline">
-              Step {state.currentStep} of 5
+              Step {state.currentStep} of 4
             </span>
 
-            {state.currentStep < 5 && (
+            {state.currentStep < 4 && (
               <button
                 type="button"
                 onClick={handleSkipStep}
@@ -286,7 +264,7 @@ export function WorkspaceWizard() {
               </button>
             )}
 
-            {state.currentStep < 5 ? (
+            {state.currentStep < 4 ? (
               <button
                 type="button"
                 onClick={nextStep}

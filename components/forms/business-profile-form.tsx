@@ -3,7 +3,9 @@
 import * as React from "react"
 import { useWorkspace, BusinessProfileData } from "@/context/workspace-context"
 import { notify } from "@/lib/toast"
-import { Building2, Sparkles, Check } from "lucide-react"
+import { Select } from "@/components/ui/select"
+import { PhoneInput } from "@/components/ui/phone-input"
+import { Building2, Sparkles, Check, Globe } from "lucide-react"
 
 interface BusinessProfileFormProps {
   onSavedNotice?: () => void
@@ -97,27 +99,18 @@ export function BusinessProfileForm({
           <label className="text-sm font-semibold text-foreground">
             Primary Industry Segment
           </label>
-          <select
-            name="industry"
+          <Select
             value={data.industry}
-            onChange={handleInputChange}
-            className="h-11 w-full rounded-xl border border-input bg-muted/30 px-3.5 text-sm text-foreground focus:ring-2 focus:ring-ring focus:outline-none"
-          >
-            <option value="Enterprise Software & AI">
-              Enterprise Software & AI
-            </option>
-            <option value="Financial Services & Fintech">
-              Financial Services & Fintech
-            </option>
-            <option value="Healthcare & BioTech">Healthcare & BioTech</option>
-            <option value="Logistics & Supply Chain">
-              Logistics & Supply Chain
-            </option>
-            <option value="Media & Entertainment">Media & Entertainment</option>
-            <option value="Professional Services & Legal">
-              Professional Services & Legal
-            </option>
-          </select>
+            onChange={(val) => updateBusinessProfile({ industry: val })}
+            options={[
+              "Enterprise Software & AI",
+              "Financial Services & Fintech",
+              "Healthcare & BioTech",
+              "Logistics & Supply Chain",
+              "Media & Entertainment",
+              "Professional Services & Legal",
+            ]}
+          />
         </div>
 
         {/* Target Tier */}
@@ -143,10 +136,40 @@ export function BusinessProfileForm({
           <input
             type="email"
             name="supportEmail"
-            value={data.supportEmail}
+            value={data.supportEmail || ""}
             onChange={handleInputChange}
             placeholder="e.g. intake-ops@antelier.io"
             className="h-11 w-full rounded-xl border border-input bg-muted/30 px-3.5 text-sm text-foreground focus:ring-2 focus:ring-ring focus:outline-none"
+          />
+        </div>
+
+        {/* Company Website URL */}
+        <div className="space-y-2">
+          <label className="text-sm font-semibold text-foreground">
+            Organization Website URL
+          </label>
+          <div className="relative">
+            <Globe className="pointer-events-none absolute top-3.5 left-3.5 h-4 w-4 text-muted-foreground" />
+            <input
+              type="url"
+              name="companyWebsite"
+              value={data.companyWebsite || ""}
+              onChange={handleInputChange}
+              placeholder="https://company.com"
+              className="h-11 w-full rounded-xl border border-input bg-muted/30 pr-3.5 pl-10 text-sm text-foreground focus:ring-2 focus:ring-ring focus:outline-none"
+            />
+          </div>
+        </div>
+
+        {/* Company Contact Number */}
+        <div className="space-y-2">
+          <label className="text-sm font-semibold text-foreground">
+            Organization Contact Number
+          </label>
+          <PhoneInput
+            value={data.contactNumber || ""}
+            onChange={(val) => updateBusinessProfile({ contactNumber: val })}
+            placeholder="(555) 234-5678"
           />
         </div>
       </div>
@@ -181,9 +204,6 @@ export function BusinessProfileForm({
                 type="button"
                 onClick={() => {
                   updateBusinessProfile({ brandTone: tone.id })
-                  notify.info("Brand tone updated", {
-                    description: `Selected tone: ${tone.title}`,
-                  })
                 }}
                 className={`cursor-pointer rounded-xl border p-3.5 text-left transition-all ${
                   isSelected
@@ -208,10 +228,7 @@ export function BusinessProfileForm({
 
       {/* Standalone Settings Save Bar (Only visible when not embedded in wizard) */}
       {!showTitle && (
-        <div className="flex items-center justify-between border-t border-border/50 pt-4">
-          <span className="text-xs text-muted-foreground">
-            Changes auto-saved to workspace configuration.
-          </span>
+        <div className="flex items-center justify-end border-t border-border/50 pt-4">
           <button
             type="button"
             onClick={handleSave}

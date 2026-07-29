@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useWorkspace } from "@/context/workspace-context"
 import { notify } from "@/lib/toast"
-import { Bot, ShieldAlert, Check } from "lucide-react"
+import { Bot } from "lucide-react"
 
 interface AiAssistantFormProps {
   onSavedNotice?: () => void
@@ -44,8 +44,7 @@ export function AiAssistantForm({
             AI Assistant Instructions
           </h2>
           <p className="text-sm text-muted-foreground">
-            Configure system prompts, LLM engine parameters, and automatic human
-            AE escalation thresholds.
+            Configure system prompts, LLM engine parameters, and persona directives.
           </p>
         </div>
       )}
@@ -111,37 +110,6 @@ export function AiAssistantForm({
           onChange={handleInputChange}
           rows={3}
           className="w-full rounded-xl border border-input bg-muted/30 p-3.5 text-sm leading-relaxed text-foreground focus:ring-2 focus:ring-ring focus:outline-none"
-        />
-      </div>
-
-      {/* Handoff Score Slider */}
-      <div className="space-y-3.5 rounded-2xl border border-border/60 bg-muted/20 p-5">
-        <div className="flex items-center justify-between">
-          <div className="space-y-1">
-            <span className="flex items-center gap-1.5 text-sm font-bold text-foreground">
-              <ShieldAlert className="h-4 w-4 text-amber-500" />
-              Automatic AE Handoff Threshold Score
-            </span>
-            <p className="text-xs text-muted-foreground">
-              Leads scoring at or above this score trigger immediate CRM
-              provisioning and AE notifications.
-            </p>
-          </div>
-          <span className="rounded-xl border border-primary/20 bg-primary/10 px-3.5 py-1.5 font-mono text-base font-bold text-primary">
-            {data.handoffScoreThreshold} / 100
-          </span>
-        </div>
-
-        <input
-          type="range"
-          min="50"
-          max="95"
-          step="5"
-          value={data.handoffScoreThreshold}
-          onChange={(e) => {
-            updateAiAssistant({ handoffScoreThreshold: Number(e.target.value) })
-          }}
-          className="h-2.5 w-full cursor-pointer appearance-none rounded-lg bg-muted accent-primary"
         />
       </div>
 

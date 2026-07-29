@@ -5,6 +5,7 @@ import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
 import { useWorkspace } from "@/context/workspace-context"
 import { notify } from "@/lib/toast"
+import { Select } from "@/components/ui/select"
 import { IntegrationDefinition } from "../data/integrations-data"
 import {
   X,
@@ -411,15 +412,18 @@ export function OAuthModal({
                   <div className="space-y-1 text-left">
                     <label className="text-xs font-bold text-foreground">Business Phone Number</label>
                     <div className="flex gap-2">
-                      <select
-                        value={phoneCountry}
-                        onChange={(e) => setPhoneCountry(e.target.value)}
-                        className="h-9 rounded-xl border border-input bg-background px-2 text-xs font-semibold text-foreground"
-                      >
-                        <option value="+1">🇺🇸 +1</option>
-                        <option value="+44">🇬🇧 +44</option>
-                        <option value="+91">🇮🇳 +91</option>
-                      </select>
+                      <div className="w-28">
+                        <Select
+                          value={phoneCountry}
+                          onChange={(val) => setPhoneCountry(val)}
+                          className="h-9 text-xs"
+                          options={[
+                            { value: "+1", label: "🇺🇸 +1" },
+                            { value: "+44", label: "🇬🇧 +44" },
+                            { value: "+91", label: "🇮🇳 +91" },
+                          ]}
+                        />
+                      </div>
                       <input
                         type="text"
                         value={phoneNumber}
@@ -472,15 +476,16 @@ export function OAuthModal({
                 <form onSubmit={handleAuthenticate} className="space-y-4 max-w-sm mx-auto p-5 rounded-2xl border border-border bg-muted/20 shadow-xs">
                   <div className="space-y-1 text-left">
                     <label className="text-xs font-bold text-foreground">Voice Engine Provider</label>
-                    <select
+                    <Select
                       value={voiceProvider}
-                      onChange={(e) => setVoiceProvider(e.target.value)}
-                      className="w-full h-9 px-3 rounded-xl border border-input bg-background text-xs font-semibold text-foreground"
-                    >
-                      <option value="ElevenLabs / Vapi Engine">ElevenLabs / Vapi Engine</option>
-                      <option value="Bland AI Telephony">Bland AI Telephony</option>
-                      <option value="Deepgram Nova-2 + Retell AI">Deepgram Nova-2 + Retell AI</option>
-                    </select>
+                      onChange={(val) => setVoiceProvider(val)}
+                      className="h-9 text-xs"
+                      options={[
+                        "ElevenLabs / Vapi Engine",
+                        "Bland AI Telephony",
+                        "Deepgram Nova-2 + Retell AI",
+                      ]}
+                    />
                   </div>
 
                   <div className="space-y-1 text-left">
@@ -495,15 +500,16 @@ export function OAuthModal({
 
                   <div className="space-y-1 text-left">
                     <label className="text-xs font-bold text-foreground">Deployment Region</label>
-                    <select
+                    <Select
                       value={voiceRegion}
-                      onChange={(e) => setVoiceRegion(e.target.value)}
-                      className="w-full h-9 px-3 rounded-xl border border-input bg-background text-xs font-semibold text-foreground"
-                    >
-                      <option value="us-east-1 (N. Virginia)">us-east-1 (N. Virginia)</option>
-                      <option value="eu-west-1 (Ireland)">eu-west-1 (Ireland)</option>
-                      <option value="ap-southeast-1 (Singapore)">ap-southeast-1 (Singapore)</option>
-                    </select>
+                      onChange={(val) => setVoiceRegion(val)}
+                      className="h-9 text-xs"
+                      options={[
+                        "us-east-1 (N. Virginia)",
+                        "eu-west-1 (Ireland)",
+                        "ap-southeast-1 (Singapore)",
+                      ]}
+                    />
                   </div>
 
                   <button
@@ -644,17 +650,12 @@ export function OAuthModal({
                       <label className="text-xs font-bold text-foreground">{field.label}</label>
                       
                       {field.type === "select" && (
-                        <select
+                        <Select
                           value={configValues[field.key] || field.defaultValue}
-                          onChange={(e) => setConfigValues({ ...configValues, [field.key]: e.target.value })}
-                          className="w-full h-9 rounded-xl border border-input bg-background px-3 text-xs font-semibold text-foreground focus:ring-2 focus:ring-primary focus:outline-none"
-                        >
-                          {field.options?.map((opt) => (
-                            <option key={opt} value={opt}>
-                              {opt}
-                            </option>
-                          ))}
-                        </select>
+                          onChange={(val) => setConfigValues({ ...configValues, [field.key]: val })}
+                          className="h-9 text-xs"
+                          options={field.options || []}
+                        />
                       )}
 
                       {field.type === "text" && (

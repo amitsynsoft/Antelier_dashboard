@@ -40,6 +40,8 @@ const statusBadgeStyle: Record<RecentIntakeRecord["status"], string> = {
   "Pending Review": "border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400",
 }
 
+import { Select } from "@/components/ui/select"
+
 export function RecentIntakesTable() {
   const [searchTerm, setSearchTerm] = React.useState("")
   const [selectedChannel, setSelectedChannel] = React.useState<string>("all")
@@ -88,19 +90,19 @@ export function RecentIntakesTable() {
           </div>
 
           {/* Filter Dropdown */}
-          <div className="relative flex items-center">
-            <Filter className="absolute left-2.5 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
-            <select
+          <div className="w-40">
+            <Select
               value={selectedChannel}
-              onChange={(e) => setSelectedChannel(e.target.value)}
-              className="h-8.5 rounded-xl border border-input bg-muted/30 pl-7 pr-3 text-xs font-medium text-foreground focus:ring-2 focus:ring-ring focus:outline-none cursor-pointer"
-            >
-              <option value="all">All Channels</option>
-              <option value="voice">Voice Calls</option>
-              <option value="chat">Website Chat</option>
-              <option value="email">Email</option>
-              <option value="whatsapp">WhatsApp</option>
-            </select>
+              onChange={(val) => setSelectedChannel(val)}
+              className="h-8.5 text-xs"
+              options={[
+                { value: "all", label: "All Channels" },
+                { value: "voice", label: "Voice Calls" },
+                { value: "chat", label: "Website Chat" },
+                { value: "email", label: "Email" },
+                { value: "whatsapp", label: "WhatsApp" },
+              ]}
+            />
           </div>
         </div>
       </div>

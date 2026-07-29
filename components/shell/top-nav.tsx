@@ -38,21 +38,21 @@ export function TopNav({
           <Menu className="h-5 w-5" />
         </button>
 
-        <div className="lg:hidden flex items-center gap-2">
+        <div className="flex items-center gap-2 lg:hidden">
           <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#0E1A24] shadow-2xs dark:bg-stone-100">
             <span className="h-2.5 w-2.5 rounded-full bg-[#D97349]" />
           </span>
           <span className="font-serif text-xl leading-none text-foreground">
-            Antelier<span className="font-sans font-bold text-primary">Hub</span>
+            Antelier
+            <span className="font-sans font-bold text-primary">Hub</span>
           </span>
         </div>
       </div>
 
       {/* Global Actions Header: Search, Notifications, Help, Theme */}
-      <div className="flex items-center gap-2 sm:gap-3 ml-auto">
-
+      <div className="ml-auto flex items-center gap-2 sm:gap-3">
         {/* Global Command Search */}
-        <button
+        {/* <button
           type="button"
           onClick={onOpenCommandPalette}
           className="group flex w-40 sm:w-60 md:w-72 cursor-pointer items-center justify-between rounded-xl border border-border/70 bg-muted/40 px-3.5 py-2 text-xs sm:text-sm text-muted-foreground shadow-2xs transition-all hover:bg-muted/70 hover:text-foreground"
@@ -64,7 +64,7 @@ export function TopNav({
           <kbd className="py-0.5 hidden shrink-0 items-center gap-0.5 rounded border border-border bg-background px-1.5 font-mono text-[11px] font-semibold text-muted-foreground shadow-2xs md:inline-flex">
             ⌘K
           </kbd>
-        </button>
+        </button> */}
 
         {/* Notifications Center */}
         <NotificationCenter />

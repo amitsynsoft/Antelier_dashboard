@@ -53,6 +53,7 @@ export type IntegrationDefinition = {
   permissions: IntegrationPermission[]
   configFields: IntegrationConfigField[]
   mockLogs: IntegrationLogEntry[]
+  hasPromptStudio?: boolean
 }
 
 export const INTEGRATIONS_CATALOG: IntegrationDefinition[] = [
@@ -60,6 +61,7 @@ export const INTEGRATIONS_CATALOG: IntegrationDefinition[] = [
     id: "hubspot",
     name: "HubSpot CRM",
     category: "CRM & Sales",
+    hasPromptStudio: false,
     shortDescription: "Bi-directional lead sync, CRM pipeline automation, and deal stage tracking.",
     fullDescription: "Seamlessly map inbound AI-qualified leads directly into your HubSpot CRM pipelines, assign sales owners, and automatically record conversation transcripts and activity timeline events.",
     icon: "/icons/hubspot.png",

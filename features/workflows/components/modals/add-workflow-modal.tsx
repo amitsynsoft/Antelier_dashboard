@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from "framer-motion"
 import { X } from "lucide-react"
 import { IntentCategory } from "../../types"
 
+import { Select } from "@/components/ui/select"
+
 interface AddWorkflowModalProps {
   isOpen: boolean
   onClose: () => void
@@ -72,18 +74,18 @@ export function AddWorkflowModal({
               <label className="block text-sm font-semibold text-foreground">
                 Category
               </label>
-              <select
+              <Select
                 value={newWfCategory}
-                onChange={(e) => setNewWfCategory(e.target.value as IntentCategory)}
-                className="h-11 w-full rounded-xl border border-border/70 bg-muted/20 px-3.5 text-sm font-medium text-foreground focus:border-orange-500 focus:outline-none"
-              >
-                <option value="Client & Sales">Client & Sales</option>
-                <option value="Scheduling">Scheduling</option>
-                <option value="Support">Support</option>
-                <option value="Billing">Billing</option>
-                <option value="Notifications">Notifications</option>
-                <option value="Custom">Custom</option>
-              </select>
+                onChange={(val) => setNewWfCategory(val as IntentCategory)}
+                options={[
+                  "Client & Sales",
+                  "Scheduling",
+                  "Support",
+                  "Billing",
+                  "Notifications",
+                  "Custom",
+                ]}
+              />
             </div>
 
             <div className="space-y-1.5">

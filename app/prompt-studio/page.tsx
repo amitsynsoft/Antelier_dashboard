@@ -1,15 +1,5 @@
-import { AppShell } from "@/components/shell/app-shell"
-import { AiAssistantView } from "@/features/settings/ai-assistant-view"
-
-export const metadata = {
-  title: "Prompt Studio | AntelierHub",
-  description: "Configure system prompts, persona tone, and AI safety rules.",
-}
+import { redirect } from "next/navigation"
 
 export default function PromptStudioPage() {
-  return (
-    <AppShell>
-      <AiAssistantView />
-    </AppShell>
-  )
+  redirect("/integrations")
 }

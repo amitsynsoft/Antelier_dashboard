@@ -45,31 +45,12 @@ export function WorkspaceCompletionCard() {
   const isKnowledgeBaseInProgress =
     (state.knowledgeBase?.sourcesCount || 0) > 0
 
-  const isPromptStudioComplete = Boolean(
-    state.aiAssistant?.agentName?.trim?.() &&
-      state.aiAssistant?.systemPrompt?.trim?.()
-  )
-  const isPromptStudioSkipped = state.skippedSteps.includes(3)
-  const isPromptStudioInProgress = Boolean(
-    state.aiAssistant?.agentName?.trim?.() ||
-      state.aiAssistant?.systemPrompt?.trim?.()
-  )
-
   const isIntegrationsComplete = Boolean(
-    state.integrations?.hubspot ||
-      (typeof state.integrations?.webhookUrl === "string" &&
-        state.integrations.webhookUrl.trim()) ||
-      (state.integrations?.connectedMap &&
-        Object.values(state.integrations.connectedMap).some(Boolean))
+    !state.skippedSteps.includes(3) &&
+      state.integrations?.enabledMap &&
+      Object.values(state.integrations.enabledMap).some(Boolean)
   )
-  const isIntegrationsSkipped = state.skippedSteps.includes(4)
-
-  const isWorkflowBuilderComplete = Boolean(
-    isBusinessProfileComplete &&
-      isKnowledgeBaseComplete &&
-      isPromptStudioComplete &&
-      isIntegrationsComplete
-  )
+  const isIntegrationsSkipped = state.skippedSteps.includes(3)
 
   const steps = [
     {
@@ -78,10 +59,10 @@ export function WorkspaceCompletionCard() {
       description: "Company details, target intake goals, & brand tone.",
       icon: Building2,
       estimatedTime: "2 mins",
-      status: isBusinessProfileComplete
-        ? ("completed" as const)
-        : isBusinessProfileSkipped
+      status: isBusinessProfileSkipped
         ? ("skipped" as const)
+        : isBusinessProfileComplete
+        ? ("completed" as const)
         : isBusinessProfileInProgress
         ? ("in_progress" as const)
         : ("pending" as const),
@@ -92,47 +73,23 @@ export function WorkspaceCompletionCard() {
       description: "Upload SOPs, PDFs, and website URLs for AI RAG.",
       icon: FileText,
       estimatedTime: "3 mins",
-      status: isKnowledgeBaseComplete
-        ? ("completed" as const)
-        : isKnowledgeBaseSkipped
+      status: isKnowledgeBaseSkipped
         ? ("skipped" as const)
+        : isKnowledgeBaseComplete
+        ? ("completed" as const)
         : isKnowledgeBaseInProgress
         ? ("in_progress" as const)
         : ("pending" as const),
     },
     {
       number: 3,
-      title: "Prompt Studio",
-      description: "AI assistant persona, directives, and guardrails.",
-      icon: Bot,
-      estimatedTime: "3 mins",
-      status: isPromptStudioComplete
-        ? ("completed" as const)
-        : isPromptStudioSkipped
-        ? ("skipped" as const)
-        : isPromptStudioInProgress
-        ? ("in_progress" as const)
-        : ("pending" as const),
-    },
-    {
-      number: 4,
       title: "Integrations",
       description: "HubSpot CRM, WhatsApp, Voice Agent, Gmail & Webhooks.",
       icon: Grid,
       estimatedTime: "2 mins",
-      status: isIntegrationsComplete
-        ? ("completed" as const)
-        : isIntegrationsSkipped
+      status: isIntegrationsSkipped
         ? ("skipped" as const)
-        : ("pending" as const),
-    },
-    {
-      number: 5,
-      title: "Workflow Builder",
-      description: "Intent recognition rules & automated CRM routing.",
-      icon: Zap,
-      estimatedTime: "2 mins",
-      status: isWorkflowBuilderComplete
+        : isIntegrationsComplete
         ? ("completed" as const)
         : ("pending" as const),
     },

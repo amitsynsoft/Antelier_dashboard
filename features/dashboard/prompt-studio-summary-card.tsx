@@ -19,7 +19,7 @@ export function PromptStudioSummaryCard() {
       <div className="flex items-center justify-between">
         <h3 className="text-base font-bold text-foreground">Prompt Studio</h3>
         <a
-          href="#prompt-studio"
+          href="/integrations"
           className="text-xs font-semibold text-primary hover:underline"
         >
           Manage Rules
@@ -45,9 +45,9 @@ export function PromptStudioSummaryCard() {
           </p>
         </div>
         <div className="p-2.5 rounded-xl bg-muted/30 border border-border/40">
-          <p className="text-[11px] text-muted-foreground font-medium">Handoff</p>
+          <p className="text-[11px] text-muted-foreground font-medium">Model</p>
           <p className="text-base font-bold text-primary mt-0.5 font-mono">
-            {ai.handoffScoreThreshold}
+            {ai.primaryModel || "gpt-4o"}
           </p>
         </div>
         <div className="p-2.5 rounded-xl bg-muted/30 border border-border/40">
@@ -66,7 +66,7 @@ export function PromptStudioSummaryCard() {
 
       {/* Footer CTA Button */}
       <a
-        href="#prompt-studio"
+        href="/integrations"
         className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-primary/30 bg-primary/10 px-4 py-2.5 text-xs sm:text-sm font-semibold text-primary shadow-2xs hover:bg-primary hover:text-primary-foreground transition-all"
       >
         <span>Edit Prompt Studio</span>

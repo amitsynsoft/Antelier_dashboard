@@ -4,6 +4,7 @@ import * as React from "react"
 import Image from "next/image"
 import { motion } from "framer-motion"
 import { notify } from "@/lib/toast"
+import { Select } from "@/components/ui/select"
 import { AppPage, PageHeader } from "@/components/layout/app-page"
 import { usersListMock, UserItem } from "@/mock/dashboard-data"
 import { Users, UserPlus, Search, X } from "lucide-react"
@@ -337,18 +338,17 @@ export function UsersPermissionsView() {
                 <label className="mb-1 block text-xs font-bold text-foreground">
                   Role Privilege
                 </label>
-                <select
+                <Select
                   value={inviteRole}
-                  onChange={(e) =>
-                    setInviteRole(e.target.value as UserItem["role"])
-                  }
-                  className="w-full rounded-xl border border-border/70 bg-background px-3 py-2.5 text-xs font-semibold text-foreground focus:ring-1 focus:ring-primary focus:outline-none"
-                >
-                  <option value="Agent">Agent (Intake & Response)</option>
-                  <option value="Operations Manager">Operations Manager</option>
-                  <option value="AI Admin">AI Admin (Prompts & RAG)</option>
-                  <option value="Workspace Owner">Workspace Owner</option>
-                </select>
+                  onChange={(val) => setInviteRole(val as UserItem["role"])}
+                  className="h-10 text-xs"
+                  options={[
+                    { value: "Agent", label: "Agent (Intake & Response)" },
+                    { value: "Operations Manager", label: "Operations Manager" },
+                    { value: "AI Admin", label: "AI Admin (Prompts & RAG)" },
+                    { value: "Workspace Owner", label: "Workspace Owner" },
+                  ]}
+                />
               </div>
 
               <div className="flex justify-end gap-2 pt-2">

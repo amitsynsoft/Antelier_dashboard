@@ -7,12 +7,10 @@ import { notify } from "@/lib/toast"
 import { useWorkspace } from "@/context/workspace-context"
 import { BusinessProfileForm } from "@/components/forms/business-profile-form"
 import { KnowledgeBaseForm } from "@/components/forms/knowledge-base-form"
-import { AiAssistantForm } from "@/components/forms/ai-assistant-form"
 import { IntegrationsForm } from "@/components/forms/integrations-form"
 import {
   Building2,
   FileText,
-  Bot,
   Grid,
   CheckCircle2,
   ArrowRight,
@@ -28,7 +26,7 @@ export default function WorkspaceSetupPage() {
   const { state, setCurrentStep, skipStep, completeWizard } = useWorkspace()
 
   const handleFinish = () => {
-    completeWizard()
+    // completeWizard()
 
     router.push("/dashboard")
   }
@@ -36,13 +34,12 @@ export default function WorkspaceSetupPage() {
   const steps = [
     { number: 1, title: "Business Profile", icon: Building2 },
     { number: 2, title: "Knowledge Base", icon: FileText },
-    { number: 3, title: "AI Assistant", icon: Bot },
-    { number: 4, title: "Integrations", icon: Grid },
-    { number: 5, title: "Finish", icon: CheckCircle2 },
+    { number: 3, title: "Integrations", icon: Grid },
+    { number: 4, title: "Finish", icon: CheckCircle2 },
   ]
 
   const nextStep = () => {
-    if (state.currentStep < 5) {
+    if (state.currentStep < 4) {
       setCurrentStep(state.currentStep + 1)
     } else {
       handleFinish()
@@ -58,12 +55,12 @@ export default function WorkspaceSetupPage() {
   const handleSkipStep = () => {
     skipStep(state.currentStep)
 
-    if (state.currentStep < 5) {
+    if (state.currentStep < 4) {
       setCurrentStep(state.currentStep + 1)
     }
   }
 
-  const progressPercent = Math.round((state.currentStep / 5) * 100)
+  const progressPercent = Math.round((state.currentStep / 4) * 100)
 
   return (
     <div className="flex min-h-screen w-full flex-col justify-between bg-muted/30 font-sans selection:bg-primary/20 dark:bg-background">
@@ -112,7 +109,7 @@ export default function WorkspaceSetupPage() {
           <div className="flex items-center justify-between pb-1 font-sans">
             <div className="flex items-center gap-2.5">
               <span className="rounded-md border border-primary/20 bg-primary/10 px-2.5 py-0.5 font-mono text-xs font-bold text-primary">
-                Step {state.currentStep} of 5
+                Step {state.currentStep} of 4
               </span>
               <h2 className="font-serif text-base font-bold text-foreground sm:text-lg">
                 {steps[state.currentStep - 1].title}
@@ -195,9 +192,8 @@ export default function WorkspaceSetupPage() {
           >
             {state.currentStep === 1 && <BusinessProfileForm showTitle />}
             {state.currentStep === 2 && <KnowledgeBaseForm showTitle />}
-            {state.currentStep === 3 && <AiAssistantForm showTitle />}
-            {state.currentStep === 4 && <IntegrationsForm showTitle />}
-            {state.currentStep === 5 && (
+            {state.currentStep === 3 && <IntegrationsForm showTitle />}
+            {state.currentStep === 4 && (
               <div className="space-y-6 py-6 text-center">
                 <div className="mx-auto inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-500 shadow-inner ring-2 ring-emerald-500/20">
                   <ShieldCheck className="h-8 w-8" />
@@ -215,7 +211,7 @@ export default function WorkspaceSetupPage() {
                 </div>
 
                 {/* Summary Cards Grid */}
-                <div className="mx-auto grid max-w-2xl grid-cols-2 gap-3 pt-4 text-left sm:grid-cols-4">
+                <div className="mx-auto grid max-w-xl grid-cols-1 gap-3 pt-4 text-left sm:grid-cols-3">
                   <div className="rounded-xl border border-border/60 bg-muted/20 p-3.5">
                     <span className="font-mono text-xs font-bold tracking-wider text-muted-foreground uppercase">
                       Business Profile
@@ -256,41 +252,17 @@ export default function WorkspaceSetupPage() {
                   </div>
                   <div className="rounded-xl border border-border/60 bg-muted/20 p-3.5">
                     <span className="font-mono text-xs font-bold tracking-wider text-muted-foreground uppercase">
-                      AI Model
+                      Connectors
                     </span>
                     <div className="mt-0.5 truncate text-sm font-bold text-foreground">
                       {state.skippedSteps.includes(3) ? (
                         <span className="font-medium text-amber-600 dark:text-amber-400">
                           Skipped
                         </span>
-                      ) : state.aiAssistant.agentName ? (
-                        state.aiAssistant.primaryModel
+                      ) : state.integrations.enabledMap ? (
+                        `${Object.values(state.integrations.enabledMap).filter(Boolean).length} Enabled`
                       ) : (
-                        <span className="text-muted-foreground">
-                          Not Configured
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="rounded-xl border border-border/60 bg-muted/20 p-3.5">
-                    <span className="font-mono text-xs font-bold tracking-wider text-muted-foreground uppercase">
-                      Connectors
-                    </span>
-                    <div className="mt-0.5 truncate text-sm font-bold text-foreground">
-                      {state.skippedSteps.includes(4) ? (
-                        <span className="font-medium text-amber-600 dark:text-amber-400">
-                          Skipped
-                        </span>
-                      ) : state.integrations.salesforce ||
-                        state.integrations.hubspot ||
-                        state.integrations.slack ||
-                        state.integrations.snowflake ||
-                        state.integrations.webhookUrl ? (
-                        "Connected"
-                      ) : (
-                        <span className="text-muted-foreground">
-                          Not Configured
-                        </span>
+                        "4 Enabled"
                       )}
                     </div>
                   </div>
@@ -312,7 +284,7 @@ export default function WorkspaceSetupPage() {
             </button>
 
             <div className="flex items-center gap-3">
-              {state.currentStep < 5 && (
+              {state.currentStep < 4 && (
                 <button
                   type="button"
                   onClick={handleSkipStep}
@@ -323,7 +295,7 @@ export default function WorkspaceSetupPage() {
                 </button>
               )}
 
-              {state.currentStep < 5 ? (
+              {state.currentStep < 4 ? (
                 <button
                   type="button"
                   onClick={nextStep}

@@ -18,17 +18,12 @@ export function FileUploader({
   mode = "multiple",
   accept = {
     "application/pdf": [".pdf"],
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [".docx"],
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [
+      ".docx",
+    ],
     "text/plain": [".txt"],
-    "text/csv": [".csv"],
-    "application/json": [".json"],
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [".xlsx"],
-    "image/png": [".png"],
-    "image/jpeg": [".jpg", ".jpeg"],
-    "image/svg+xml": [".svg"],
-    "image/webp": [".webp"],
   },
-  acceptTypesLabel = "PDF, DOCX, TXT, CSV, JSON, XLSX, Images (Up to 50MB)",
+  acceptTypesLabel = "PDF, DOCX, TXT (Up to 50MB)",
   maxSizeMB = 50,
   maxFiles = 10,
   value = [],
@@ -108,9 +103,7 @@ export function FileUploader({
       } else if (progress < 100) {
         setFileItems((prev) =>
           prev.map((item) =>
-            item.id === itemId
-              ? { ...item, progress, stage: "indexing" }
-              : item
+            item.id === itemId ? { ...item, progress, stage: "indexing" } : item
           )
         )
       } else {
@@ -142,7 +135,9 @@ export function FileUploader({
     setGeneralError(null)
 
     if (mode === "single" && files.length > 1) {
-      setGeneralError("Single file mode: only 1 file can be uploaded at a time.")
+      setGeneralError(
+        "Single file mode: only 1 file can be uploaded at a time."
+      )
       files = [files[0]]
     }
 
@@ -182,7 +177,8 @@ export function FileUploader({
 
   const handleDropRejected = (rejections: FileRejection[]) => {
     if (rejections.length > 0) {
-      const firstError = rejections[0].errors[0]?.message || "File upload rejected"
+      const firstError =
+        rejections[0].errors[0]?.message || "File upload rejected"
       setGeneralError(`Upload rejected: ${firstError}`)
     }
   }

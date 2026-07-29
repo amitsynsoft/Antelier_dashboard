@@ -6,6 +6,8 @@ import { X } from "lucide-react"
 import { WorkflowActionType } from "../../types"
 import { ACTION_TYPE_META, PREDEFINED_INTEGRATIONS } from "../../config"
 
+import { Select } from "@/components/ui/select"
+
 interface AddActionModalProps {
   isOpen: boolean
   onClose: () => void
@@ -141,24 +143,24 @@ export function AddActionModal({
                 <label className="block text-sm font-semibold text-foreground">
                   Action Category
                 </label>
-                <select
+                <Select
                   value={customActionType}
-                  onChange={(e) =>
-                    setCustomActionType(e.target.value as WorkflowActionType)
+                  onChange={(val) =>
+                    setCustomActionType(val as WorkflowActionType)
                   }
-                  className="h-11 w-full rounded-xl border border-border/70 bg-muted/20 px-3.5 text-sm font-medium text-foreground focus:border-orange-500 focus:outline-none"
-                >
-                  <option value="crm">CRM Integration</option>
-                  <option value="calendar">Calendar Integration</option>
-                  <option value="email">Email Service</option>
-                  <option value="whatsapp">WhatsApp API</option>
-                  <option value="call">Voice Call Staff</option>
-                  <option value="notification">Team Notification</option>
-                  <option value="ticket">Support Desk Ticket</option>
-                  <option value="finance">Finance & Payment</option>
-                  <option value="webhook">Custom Webhook</option>
-                  <option value="custom">Cloud Function Script</option>
-                </select>
+                  options={[
+                    { value: "crm", label: "CRM Integration" },
+                    { value: "calendar", label: "Calendar Integration" },
+                    { value: "email", label: "Email Service" },
+                    { value: "whatsapp", label: "WhatsApp API" },
+                    { value: "call", label: "Voice Call Staff" },
+                    { value: "notification", label: "Team Notification" },
+                    { value: "ticket", label: "Support Desk Ticket" },
+                    { value: "finance", label: "Finance & Payment" },
+                    { value: "webhook", label: "Custom Webhook" },
+                    { value: "custom", label: "Cloud Function Script" },
+                  ]}
+                />
               </div>
 
               <div className="space-y-1.5">

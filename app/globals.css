@@ -146,3 +146,175 @@
   background-image: linear-gradient(rgba(250, 247, 242, 0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(250, 247, 242, 0.04) 1px, transparent 1px);
   background-size: 56px 56px;
 }
+
+/* 100% Solid Non-Translucent Toast Styling for Sonner */
+[data-sonner-toaster] {
+  font-family: var(--font-sans), sans-serif !important;
+}
+
+[data-sonner-toast] {
+  background-color: #ffffff !important;
+  color: var(--foreground) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 1.25rem !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.08) !important;
+  padding: 0.875rem 1.25rem !important;
+  gap: 0.75rem !important;
+  opacity: 1 !important;
+}
+
+.dark [data-sonner-toast] {
+  background-color: #13222e !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+[data-sonner-toast] [data-title] {
+  font-weight: 700 !important;
+  font-size: 0.875rem !important;
+  color: var(--foreground) !important;
+  line-height: 1.35 !important;
+}
+
+[data-sonner-toast] [data-description] {
+  font-weight: 500 !important;
+  font-size: 0.8125rem !important;
+  color: var(--muted-foreground) !important;
+  margin-top: 0.25rem !important;
+  line-height: 1.4 !important;
+}
+
+/* Sonner Close Button Positioning */
+[data-sonner-toast] [data-close-button] {
+  position: absolute !important;
+  top: 0.625rem !important;
+  right: 0.625rem !important;
+  left: auto !important;
+  transform: none !important;
+  border-radius: 9999px !important;
+  width: 1.375rem !important;
+  height: 1.375rem !important;
+  background-color: var(--muted) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--muted-foreground) !important;
+  transition: all 0.15s ease !important;
+  opacity: 1 !important;
+}
+
+[data-sonner-toast] [data-close-button]:hover {
+  background-color: var(--accent) !important;
+  color: var(--foreground) !important;
+}
+
+/* 100% Opaque Solid Success Toast */
+[data-sonner-toast][data-type="success"] {
+  background-color: #f0fdf4 !important;
+  border-color: #86efac !important;
+  opacity: 1 !important;
+}
+
+[data-sonner-toast][data-type="success"] [data-title] {
+  color: #15803d !important;
+}
+
+.dark [data-sonner-toast][data-type="success"] {
+  background-color: #062c1e !important;
+  border-color: #059669 !important;
+}
+
+.dark [data-sonner-toast][data-type="success"] [data-title] {
+  color: #6ee7b7 !important;
+}
+
+/* 100% Opaque Solid Info Toast */
+[data-sonner-toast][data-type="info"] {
+  background-color: #eff6ff !important;
+  border-color: #93c5fd !important;
+  opacity: 1 !important;
+}
+
+[data-sonner-toast][data-type="info"] [data-title] {
+  color: #1d4ed8 !important;
+}
+
+.dark [data-sonner-toast][data-type="info"] {
+  background-color: #0f294a !important;
+  border-color: #2563eb !important;
+}
+
+.dark [data-sonner-toast][data-type="info"] [data-title] {
+  color: #93c5fd !important;
+}
+
+/* 100% Opaque Solid Error Toast */
+[data-sonner-toast][data-type="error"] {
+  background-color: #fef2f2 !important;
+  border-color: #fca5a5 !important;
+  opacity: 1 !important;
+}
+
+[data-sonner-toast][data-type="error"] [data-title] {
+  color: #b91c1c !important;
+}
+
+.dark [data-sonner-toast][data-type="error"] {
+  background-color: #361014 !important;
+  border-color: #dc2626 !important;
+}
+
+.dark [data-sonner-toast][data-type="error"] [data-title] {
+  color: #fca5a5 !important;
+}
+
+/* 100% Opaque Solid Warning Toast */
+[data-sonner-toast][data-type="warning"] {
+  background-color: #fffbeb !important;
+  border-color: #fde68a !important;
+  opacity: 1 !important;
+}
+
+[data-sonner-toast][data-type="warning"] [data-title] {
+  color: #b45309 !important;
+}
+
+.dark [data-sonner-toast][data-type="warning"] {
+  background-color: #332107 !important;
+  border-color: #d97706 !important;
+}
+
+.dark [data-sonner-toast][data-type="warning"] [data-title] {
+  color: #fcd34d !important;
+}
+
+/* Antelier Theme Overrides for react-phone-number-input */
+.antelier-phone-input-wrapper .PhoneInput {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.antelier-phone-input-wrapper .PhoneInputInput {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: inherit;
+  font-family: inherit;
+  color: var(--color-foreground);
+}
+
+.antelier-phone-input-wrapper .PhoneInputInput::placeholder {
+  color: var(--color-muted-foreground);
+  opacity: 0.8;
+}
+
+.antelier-phone-input-wrapper .PhoneInputCountryIcon {
+  width: 1.35rem;
+  height: 0.95rem;
+  border-radius: 2px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  display: block;
+}
+
+.antelier-phone-input-wrapper .PhoneInputCountrySelectArrow {
+  display: none;
+}

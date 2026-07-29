@@ -10,15 +10,16 @@ export function Toaster() {
     <SonnerToaster
       theme={theme as "light" | "dark"}
       position="top-center"
-      richColors
+      expand={true}
+      visibleToasts={5}
+      gap={10}
       closeButton
       duration={3500}
       toastOptions={{
         style: {
           zIndex: 99999,
         },
-        className:
-          "!font-sans !rounded-2xl !border !border-border/80 !shadow-2xl !text-sm !font-semibold !p-4",
+        className: "!font-sans !rounded-2xl !p-4 !shadow-2xl",
       }}
     />
   )

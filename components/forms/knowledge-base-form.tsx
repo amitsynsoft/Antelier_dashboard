@@ -2,16 +2,11 @@
 
 import * as React from "react"
 import { useWorkspace, KnowledgeBaseData } from "@/context/workspace-context"
-import { FileUploader } from "@/components/ui/file-uploader"
+import { Select } from "@/components/ui/select"
+import { Checkbox } from "@/components/ui/checkbox"
+import { FileUploader } from "@/components/ui/file-uploader/file-uploader"
 import { notify } from "@/lib/toast"
-import {
-  FileText,
-  Link as LinkIcon,
-  Trash2,
-  Plus,
-  CheckCircle2,
-  Check,
-} from "lucide-react"
+import { FileText, Check, Lightbulb } from "lucide-react"
 
 interface KnowledgeBaseFormProps {
   onSavedNotice?: () => void
@@ -24,40 +19,12 @@ export function KnowledgeBaseForm({
 }: KnowledgeBaseFormProps) {
   const { state, updateKnowledgeBase } = useWorkspace()
   const data = state.knowledgeBase
-  const [newUrl, setNewUrl] = React.useState("")
 
   const handleFilesChange = (fileNames: string[]) => {
     updateKnowledgeBase({
       uploadedFiles: fileNames,
-      sourcesCount: fileNames.length + data.scrapeUrls.length,
+      sourcesCount: fileNames.length + (data.scrapeUrls?.length || 0),
     })
-  }
-
-  const handleAddUrl = () => {
-    if (newUrl.trim()) {
-      const updated = [...data.scrapeUrls, newUrl.trim()]
-      updateKnowledgeBase({
-        scrapeUrls: updated,
-        sourcesCount: data.uploadedFiles.length + updated.length,
-      })
-      notify.success("Documentation URL added!", {
-        description: `Active web scraper target: ${newUrl.trim()}`,
-      })
-      setNewUrl("")
-      onSavedNotice?.()
-    }
-  }
-
-  const handleRemoveUrl = (url: string) => {
-    const updated = data.scrapeUrls.filter((u) => u !== url)
-    updateKnowledgeBase({
-      scrapeUrls: updated,
-      sourcesCount: data.uploadedFiles.length + updated.length,
-    })
-    notify.info("Web scraper URL removed", {
-      description: url,
-    })
-    onSavedNotice?.()
   }
 
   return (
@@ -75,6 +42,19 @@ export function KnowledgeBaseForm({
         </div>
       )}
 
+      {/* Tip Banner */}
+      <div className="flex items-start gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-xs leading-relaxed text-foreground sm:text-sm">
+        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400">
+          <Lightbulb className="h-4 w-4" />
+        </div>
+        <div>
+          <span className="font-bold text-foreground">Tip: </span>
+          Include anything a customer might ask — prices, packages, service
+          areas, hours, common questions. The clearer the document, the better
+          the answers.
+        </div>
+      </div>
+
       {/* Enterprise Reusable FileUploader Suite */}
       <div className="space-y-2">
         <label className="text-sm font-semibold text-foreground">
@@ -87,120 +67,11 @@ export function KnowledgeBaseForm({
           maxFiles={15}
           value={data.uploadedFiles}
           onFilesChange={handleFilesChange}
-          onUploadComplete={(name) => {
-            notify.success(`Document indexed!`, {
-              description: `"${name}" processed & added to vector store.`,
-            })
-          }}
         />
       </div>
 
-      {/* Website & Documentation Web Scrapers */}
-      <div className="space-y-2 border-t border-border/40 pt-3">
-        <label className="text-sm font-semibold text-foreground">
-          Active Documentation Scraping URLs
-        </label>
-        <div className="flex gap-2.5">
-          <input
-            type="url"
-            value={newUrl}
-            onChange={(e) => setNewUrl(e.target.value)}
-            placeholder="https://yourcompany.com/docs"
-            className="h-11 flex-1 rounded-xl border border-input bg-muted/30 px-3.5 text-sm text-foreground focus:ring-2 focus:ring-ring focus:outline-none"
-          />
-          <button
-            type="button"
-            onClick={handleAddUrl}
-            className="flex h-11 cursor-pointer items-center gap-1.5 rounded-xl bg-primary px-4 text-sm font-bold text-primary-foreground shadow-2xs hover:opacity-90"
-          >
-            <Plus className="h-4 w-4" />
-            <span>Add URL</span>
-          </button>
-        </div>
-
-        {/* URL List */}
-        {data.scrapeUrls.length > 0 && (
-          <div className="space-y-2 pt-2">
-            {data.scrapeUrls.map((url, idx) => (
-              <div
-                key={idx}
-                className="flex items-center justify-between rounded-xl border border-border/60 bg-card p-3 text-sm"
-              >
-                <div className="flex items-center gap-2.5 truncate">
-                  <LinkIcon className="h-4 w-4 shrink-0 text-blue-500" />
-                  <span className="truncate font-mono text-xs text-muted-foreground">
-                    {url}
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handleRemoveUrl(url)}
-                  className="cursor-pointer p-1.5 text-muted-foreground transition-colors hover:text-rose-500"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Sync Settings */}
-      <div className="grid grid-cols-1 gap-5 border-t border-border/40 pt-3 sm:grid-cols-2">
-        <div className="space-y-2">
-          <label className="text-sm font-semibold text-foreground">
-            Vector Index Refresh Frequency
-          </label>
-          <select
-            value={data.syncInterval}
-            onChange={(e) => {
-              updateKnowledgeBase({
-                syncInterval: e.target
-                  .value as KnowledgeBaseData["syncInterval"],
-              })
-              notify.info("Vector index refresh frequency updated", {
-                description: `Frequency set to: ${e.target.value}`,
-              })
-              onSavedNotice?.()
-            }}
-            className="h-11 w-full rounded-xl border border-input bg-muted/30 px-3.5 text-sm text-foreground focus:ring-2 focus:ring-ring focus:outline-none"
-          >
-            <option value="realtime">Real-time Webhook</option>
-            <option value="hourly">Hourly Auto Sync</option>
-            <option value="daily">Daily Cron Sync</option>
-            <option value="weekly">Weekly Sync</option>
-          </select>
-        </div>
-
-        <div className="mt-auto flex items-center justify-between rounded-xl border border-border/60 bg-muted/20 p-3.5">
-          <div className="space-y-0.5">
-            <div className="text-sm font-bold text-foreground">
-              Auto-Parse PDF Tables & OCR
-            </div>
-            <div className="text-xs text-muted-foreground">
-              Extract custom SLA tables automatically
-            </div>
-          </div>
-          <input
-            type="checkbox"
-            checked={data.autoParsePdf}
-            onChange={(e) => {
-              updateKnowledgeBase({ autoParsePdf: e.target.checked })
-              notify.info("PDF OCR Settings saved", {
-                description: `Auto-parsing ${e.target.checked ? "enabled" : "disabled"}.`,
-              })
-              onSavedNotice?.()
-            }}
-            className="h-5 w-5 cursor-pointer rounded-lg border-input text-primary focus:ring-primary"
-          />
-        </div>
-      </div>
-
       {!showTitle && (
-        <div className="flex items-center justify-between border-t border-border/50 pt-4">
-          <span className="text-xs text-muted-foreground">
-            Changes auto-saved to workspace vector store.
-          </span>
+        <div className="flex items-center justify-end border-t border-border/50 pt-4">
           <button
             type="button"
             onClick={() => {
