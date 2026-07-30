@@ -113,7 +113,7 @@ export function UsersPermissionsView() {
 
       {/* Filter & Search Header */}
       <div className="flex flex-col justify-between gap-4 border-b border-border/60 pb-3 sm:flex-row sm:items-center">
-        <div className="flex flex-wrap items-center gap-1.5">
+        <div className="flex scrollbar-none items-center gap-1.5 overflow-x-auto pb-1 max-w-full">
           {[
             "All Roles",
             "Workspace Owner",
@@ -125,7 +125,7 @@ export function UsersPermissionsView() {
               key={role}
               type="button"
               onClick={() => setSelectedRole(role)}
-              className={`cursor-pointer rounded-xl px-3 py-1.5 text-xs font-bold transition-all ${
+              className={`cursor-pointer rounded-xl px-3 py-1.5 text-xs font-bold whitespace-nowrap shrink-0 transition-all ${
                 selectedRole === role
                   ? "bg-primary text-primary-foreground shadow-2xs"
                   : "bg-muted/50 text-muted-foreground hover:bg-muted"
@@ -151,15 +151,15 @@ export function UsersPermissionsView() {
       {/* Users Table Grid */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
         <div className={selectedUser ? "lg:col-span-7" : "lg:col-span-12"}>
-          <div className="overflow-hidden rounded-3xl border border-border/70 bg-card shadow-xs">
-            <table className="w-full border-collapse text-left">
+          <div className="overflow-x-auto rounded-3xl border border-border/70 bg-card shadow-xs">
+            <table className="w-full min-w-[560px] border-collapse text-left sm:min-w-full">
               <thead>
                 <tr className="border-b border-border/60 bg-muted/20 text-xs font-bold tracking-wider text-muted-foreground uppercase">
-                  <th className="p-3.5">User</th>
-                  <th className="p-3.5">Role</th>
-                  <th className="hidden p-3.5 sm:table-cell">Team</th>
-                  <th className="p-3.5">Status</th>
-                  <th className="p-3.5 text-right">Last Active</th>
+                  <th className="p-3 sm:p-3.5">User</th>
+                  <th className="p-3 sm:p-3.5">Role</th>
+                  <th className="hidden p-3 sm:p-3.5 md:table-cell">Team</th>
+                  <th className="p-3 sm:p-3.5">Status</th>
+                  <th className="p-3 sm:p-3.5 text-right">Last Active</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/50 text-xs">
@@ -173,29 +173,29 @@ export function UsersPermissionsView() {
                         isSelected ? "bg-primary/10" : "hover:bg-muted/50"
                       }`}
                     >
-                      <td className="p-3.5">
-                        <div className="flex items-center gap-2.5">
+                      <td className="p-3 sm:p-3.5">
+                        <div className="flex items-center gap-2.5 min-w-0">
                           <Image
                             src={u.avatar}
                             alt={u.name}
                             width={32}
                             height={32}
-                            className="h-8 w-8 rounded-full border border-border object-cover"
+                            className="h-8 w-8 shrink-0 rounded-full border border-border object-cover"
                           />
-                          <div>
-                            <p className="leading-tight font-bold text-foreground">
+                          <div className="min-w-0 flex-1">
+                            <p className="leading-tight font-bold text-foreground truncate max-w-[130px] sm:max-w-xs">
                               {u.name}
                             </p>
-                            <p className="text-xs text-muted-foreground">
+                            <p className="text-xs text-muted-foreground truncate max-w-[130px] sm:max-w-xs">
                               {u.email}
                             </p>
                           </div>
                         </div>
                       </td>
 
-                      <td className="p-3.5">
+                      <td className="p-3 sm:p-3.5">
                         <span
-                          className={`rounded-full border px-2.5 py-0.5 text-xs font-bold ${
+                          className={`inline-block rounded-full border px-2.5 py-0.5 text-[11px] sm:text-xs font-bold whitespace-nowrap ${
                             u.role === "Workspace Owner"
                               ? "border-primary/20 bg-primary/10 text-primary"
                               : "border-border/60 bg-muted text-foreground"
@@ -205,23 +205,23 @@ export function UsersPermissionsView() {
                         </span>
                       </td>
 
-                      <td className="hidden p-3.5 font-semibold text-muted-foreground sm:table-cell">
+                      <td className="hidden p-3 sm:p-3.5 font-semibold text-muted-foreground md:table-cell whitespace-nowrap">
                         {u.team}
                       </td>
 
-                      <td className="p-3.5">
+                      <td className="p-3 sm:p-3.5">
                         <span
-                          className={`rounded px-2.5 py-0.5 text-xs font-bold ${
+                          className={`inline-block rounded px-2.5 py-0.5 text-[11px] sm:text-xs font-bold whitespace-nowrap ${
                             u.status === "Active"
-                              ? "border border-emerald-500/30 bg-emerald-500/10 text-emerald-600"
-                              : "border border-amber-500/30 bg-amber-500/10 text-amber-600"
+                              ? "border border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                              : "border border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400"
                           }`}
                         >
                           {u.status}
                         </span>
                       </td>
 
-                      <td className="p-3.5 text-right font-mono text-[11px] text-muted-foreground">
+                      <td className="p-3 sm:p-3.5 text-right font-mono text-[11px] text-muted-foreground whitespace-nowrap">
                         {u.lastActive}
                       </td>
                     </tr>
