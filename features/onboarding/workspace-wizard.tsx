@@ -19,7 +19,6 @@ import {
   Zap,
   Check,
   FastForward,
-  AlertCircle
 } from "lucide-react"
 
 export function WorkspaceWizard() {
@@ -29,7 +28,6 @@ export function WorkspaceWizard() {
     skipStep,
     completeWizard,
     closeWizard,
-    completionPercentage
   } = useWorkspace()
 
   const [savedMessage, setSavedMessage] = React.useState<string | null>(null)
@@ -70,35 +68,35 @@ export function WorkspaceWizard() {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-background/80 backdrop-blur-md">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 bg-background/80 backdrop-blur-md">
       {/* Container */}
-      <div className="relative w-full max-w-4xl rounded-2xl border border-border bg-popover text-popover-foreground shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="relative w-full max-w-4xl rounded-xl sm:rounded-2xl border border-border bg-popover text-popover-foreground shadow-2xl overflow-hidden flex flex-col max-h-[95vh] sm:max-h-[90vh]">
         {/* Header Bar */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border/60 bg-muted/20">
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground font-bold shadow-md">
-              <Sparkles className="h-5 w-5" />
+        <div className="flex items-center justify-between gap-2 px-3.5 py-3 sm:px-6 sm:py-4 border-b border-border/60 bg-muted/20">
+          <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+            <div className="flex h-7 w-7 sm:h-9 sm:w-9 items-center justify-center rounded-lg sm:rounded-xl bg-primary text-primary-foreground font-bold shadow-md shrink-0">
+              <Sparkles className="h-4 w-4 sm:h-5 sm:w-5" />
             </div>
-            <div>
-              <h2 className="text-base font-bold text-foreground tracking-tight">
+            <div className="min-w-0">
+              <h2 className="text-xs sm:text-base font-bold text-foreground tracking-tight truncate">
                 AntelierHub Workspace Setup Wizard
               </h2>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-[11px] sm:text-xs text-muted-foreground line-clamp-1 sm:line-clamp-none">
                 Configure essential AI client intake parameters or skip individual steps to set up later.
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             {savedMessage && (
-              <span className="text-xs font-mono font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
+              <span className="hidden xs:inline-block text-[10px] sm:text-xs font-mono font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 sm:px-3 sm:py-1 rounded-full border border-emerald-500/20">
                 {savedMessage}
               </span>
             )}
             <button
               type="button"
               onClick={closeWizard}
-              className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors cursor-pointer border border-border/40"
+              className="p-1 sm:p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors cursor-pointer border border-border/40 shrink-0"
               title="Close Wizard"
             >
               <X className="h-4 w-4" />
@@ -107,8 +105,8 @@ export function WorkspaceWizard() {
         </div>
 
         {/* Stepper Navigation */}
-        <div className="px-4 sm:px-6 py-3 border-b border-border/40 bg-card">
-          <div className="flex items-center justify-between gap-1.5 sm:gap-2.5 w-full">
+        <div className="px-2.5 sm:px-6 py-2.5 sm:py-3 border-b border-border/40 bg-card">
+          <div className="flex items-center justify-between gap-1 sm:gap-2.5 w-full">
             {steps.map((step) => {
               const isActive = state.currentStep === step.number
               const isSkipped = state.skippedSteps.includes(step.number)
@@ -120,18 +118,18 @@ export function WorkspaceWizard() {
                   type="button"
                   onClick={() => setCurrentStep(step.number)}
                   title={`${step.title}${isSkipped ? " (Skipped)" : isCompleted ? " (Completed)" : ""}`}
-                  className={`flex items-center gap-1.5 sm:gap-2 rounded-full text-xs transition-all cursor-pointer border ${
+                  className={`flex items-center gap-1 sm:gap-2 rounded-full text-xs transition-all cursor-pointer border ${
                     isActive
-                      ? "bg-primary/15 text-primary border-primary/40 ring-2 ring-primary/20 shadow-2xs font-extrabold flex-1 justify-center px-3.5 py-2"
+                      ? "bg-primary/15 text-primary border-primary/40 ring-2 ring-primary/20 shadow-2xs font-extrabold flex-1 justify-center px-2.5 py-1.5 sm:px-3.5 sm:py-2"
                       : isCompleted
-                      ? "bg-emerald-500/10 text-foreground border-emerald-500/30 hover:bg-emerald-500/20 px-2 sm:px-2.5 py-1.5 font-semibold"
+                      ? "bg-emerald-500/10 text-foreground border-emerald-500/30 hover:bg-emerald-500/20 px-1.5 py-1 sm:px-2.5 sm:py-1.5 font-semibold"
                       : isSkipped
-                      ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30 hover:bg-amber-500/20 px-2 sm:px-2.5 py-1.5 font-semibold"
-                      : "bg-background text-muted-foreground border-border/50 hover:bg-muted hover:text-foreground px-2 sm:px-2.5 py-1.5 font-medium"
+                      ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30 hover:bg-amber-500/20 px-1.5 py-1 sm:px-2.5 sm:py-1.5 font-semibold"
+                      : "bg-background text-muted-foreground border-border/50 hover:bg-muted hover:text-foreground px-1.5 py-1 sm:px-2.5 sm:py-1.5 font-medium"
                   }`}
                 >
                   <div
-                    className={`flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-full text-[11px] font-mono font-bold shrink-0 transition-colors ${
+                    className={`flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-full text-[10px] sm:text-[11px] font-mono font-bold shrink-0 transition-colors ${
                       isActive
                         ? "bg-primary text-primary-foreground"
                         : isCompleted
@@ -150,7 +148,7 @@ export function WorkspaceWizard() {
                     )}
                   </div>
 
-                  <span className={`whitespace-nowrap ${isActive ? "font-bold" : "hidden sm:inline font-semibold text-[11px] max-w-[110px] truncate"}`}>
+                  <span className={`whitespace-nowrap ${isActive ? "font-bold text-[11px] sm:text-xs" : "hidden sm:inline font-semibold text-[11px] max-w-[110px] truncate"}`}>
                     {step.title}
                   </span>
                 </button>
@@ -160,7 +158,7 @@ export function WorkspaceWizard() {
         </div>
 
         {/* Step Content Area */}
-        <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-6">
+        <div className="flex-1 overflow-y-auto p-3.5 sm:p-8 space-y-4 sm:space-y-6">
           <motion.div
             key={state.currentStep}
             initial={{ opacity: 0 }}
@@ -178,13 +176,13 @@ export function WorkspaceWizard() {
               <IntegrationsForm onSavedNotice={handleSavedNotice} showTitle />
             )}
             {state.currentStep === 4 && (
-              <div className="space-y-6 text-center py-4">
-                <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-500 ring-2 ring-emerald-500/20 shadow-inner mx-auto">
-                  <ShieldCheck className="h-8 w-8" />
+              <div className="space-y-4 sm:space-y-6 text-center py-3 sm:py-4">
+                <div className="inline-flex h-12 w-12 sm:h-16 sm:w-16 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-500 ring-2 ring-emerald-500/20 shadow-inner mx-auto">
+                  <ShieldCheck className="h-6 w-6 sm:h-8 sm:w-8" />
                 </div>
 
-                <div className="space-y-2">
-                  <h3 className="text-2xl font-bold tracking-tight text-foreground">
+                <div className="space-y-1.5 sm:space-y-2">
+                  <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
                     Workspace Setup Overview
                   </h3>
                   <p className="text-xs sm:text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
@@ -193,10 +191,10 @@ export function WorkspaceWizard() {
                 </div>
 
                 {/* Progress Summary Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-left pt-4 max-w-xl mx-auto">
-                  <div className="p-3.5 rounded-xl border border-border/60 bg-muted/20">
-                    <span className="text-xs uppercase font-mono font-bold text-muted-foreground tracking-wider">Business Profile</span>
-                    <div className="text-sm font-bold text-foreground truncate mt-0.5">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 text-left pt-2 sm:pt-4 max-w-xl mx-auto">
+                  <div className="p-3 sm:p-3.5 rounded-xl border border-border/60 bg-muted/20">
+                    <span className="text-[10px] sm:text-xs uppercase font-mono font-bold text-muted-foreground tracking-wider">Business Profile</span>
+                    <div className="text-xs sm:text-sm font-bold text-foreground truncate mt-0.5">
                       {state.skippedSteps.includes(1) ? (
                         <span className="text-amber-600 dark:text-amber-400 font-medium">Skipped</span>
                       ) : state.businessProfile.companyName ? (
@@ -206,9 +204,9 @@ export function WorkspaceWizard() {
                       )}
                     </div>
                   </div>
-                  <div className="p-3.5 rounded-xl border border-border/60 bg-muted/20">
-                    <span className="text-xs uppercase font-mono font-bold text-muted-foreground tracking-wider">Knowledge Base</span>
-                    <div className="text-sm font-bold text-foreground truncate mt-0.5">
+                  <div className="p-3 sm:p-3.5 rounded-xl border border-border/60 bg-muted/20">
+                    <span className="text-[10px] sm:text-xs uppercase font-mono font-bold text-muted-foreground tracking-wider">Knowledge Base</span>
+                    <div className="text-xs sm:text-sm font-bold text-foreground truncate mt-0.5">
                       {state.skippedSteps.includes(2) ? (
                         <span className="text-amber-600 dark:text-amber-400 font-medium">Skipped</span>
                       ) : (state.knowledgeBase.uploadedFiles.length + state.knowledgeBase.scrapeUrls.length) > 0 ? (
@@ -218,9 +216,9 @@ export function WorkspaceWizard() {
                       )}
                     </div>
                   </div>
-                  <div className="p-3.5 rounded-xl border border-border/60 bg-muted/20">
-                    <span className="text-xs uppercase font-mono font-bold text-muted-foreground tracking-wider">Connectors</span>
-                    <div className="text-sm font-bold text-foreground truncate mt-0.5">
+                  <div className="p-3 sm:p-3.5 rounded-xl border border-border/60 bg-muted/20">
+                    <span className="text-[10px] sm:text-xs uppercase font-mono font-bold text-muted-foreground tracking-wider">Connectors</span>
+                    <div className="text-xs sm:text-sm font-bold text-foreground truncate mt-0.5">
                       {state.skippedSteps.includes(3) ? (
                         <span className="text-amber-600 dark:text-amber-400 font-medium">Skipped</span>
                       ) : state.integrations.enabledMap ? (
@@ -237,19 +235,19 @@ export function WorkspaceWizard() {
         </div>
 
         {/* Footer Action Bar */}
-        <div className="flex items-center justify-between px-6 py-4 border-t border-border/60 bg-muted/20">
+        <div className="flex items-center justify-between gap-1.5 sm:gap-3 px-3.5 py-3 sm:px-6 sm:py-4 border-t border-border/60 bg-muted/20">
           <button
             type="button"
             onClick={prevStep}
             disabled={state.currentStep === 1}
-            className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-xl border border-border bg-background hover:bg-muted text-muted-foreground hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+            className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-xs font-semibold rounded-xl border border-border bg-background hover:bg-muted text-muted-foreground hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer shrink-0"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             <span>Back</span>
           </button>
 
-          <div className="flex items-center gap-3">
-            <span className="text-xs text-muted-foreground font-mono hidden sm:inline">
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+            <span className="text-xs text-muted-foreground font-mono hidden md:inline">
               Step {state.currentStep} of 4
             </span>
 
@@ -257,9 +255,9 @@ export function WorkspaceWizard() {
               <button
                 type="button"
                 onClick={handleSkipStep}
-                className="flex items-center gap-1.5 px-4 py-2.5 text-xs font-bold rounded-xl border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 transition-colors cursor-pointer"
+                className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-4 py-1.5 sm:py-2.5 text-xs font-bold rounded-xl border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 transition-colors cursor-pointer shrink-0"
               >
-                <span>Skip Step</span>
+                <span>Skip<span className="hidden xs:inline"> Step</span></span>
                 <FastForward className="h-3.5 w-3.5" />
               </button>
             )}
@@ -268,19 +266,19 @@ export function WorkspaceWizard() {
               <button
                 type="button"
                 onClick={nextStep}
-                className="flex items-center gap-1.5 px-5 py-2.5 text-xs font-bold rounded-xl bg-primary text-primary-foreground hover:opacity-90 transition-all shadow-2xs cursor-pointer"
+                className="flex items-center gap-1 sm:gap-1.5 px-3 sm:px-5 py-1.5 sm:py-2.5 text-xs font-bold rounded-xl bg-primary text-primary-foreground hover:opacity-90 transition-all shadow-2xs cursor-pointer shrink-0"
               >
-                <span>Save & Continue</span>
+                <span>Save<span className="hidden xs:inline"> & Continue</span></span>
                 <ArrowRight className="h-3.5 w-3.5" />
               </button>
             ) : (
               <button
                 type="button"
                 onClick={completeWizard}
-                className="flex items-center gap-1.5 px-5 py-2.5 text-xs font-bold rounded-xl bg-emerald-600 text-white hover:bg-emerald-500 transition-all shadow-md cursor-pointer"
+                className="flex items-center gap-1 sm:gap-1.5 px-3 sm:px-5 py-1.5 sm:py-2.5 text-xs font-bold rounded-xl bg-emerald-600 text-white hover:bg-emerald-500 transition-all shadow-md cursor-pointer shrink-0"
               >
-                <Zap className="h-4 w-4" />
-                <span>Complete & Open Dashboard</span>
+                <Zap className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <span>Complete<span className="hidden xs:inline"> & Open Dashboard</span></span>
               </button>
             )}
           </div>

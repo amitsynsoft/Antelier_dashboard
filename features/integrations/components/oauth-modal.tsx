@@ -127,13 +127,13 @@ export function OAuthModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-background/80 backdrop-blur-md">
-      <div className="relative w-full max-w-2xl rounded-3xl border border-border bg-card text-card-foreground shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-background/80 backdrop-blur-md">
+      <div className="relative w-full max-w-2xl rounded-2xl sm:rounded-3xl border border-border bg-card text-card-foreground shadow-2xl overflow-hidden flex flex-col max-h-[95vh] sm:max-h-[92vh]">
         {/* Top Header Bar */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border/60 bg-muted/20">
-          <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between gap-2 px-3.5 py-3 sm:px-6 sm:py-4 border-b border-border/60 bg-muted/20">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
             <div
-              className="flex h-10 w-10 items-center justify-center rounded-2xl border p-2 shrink-0 shadow-2xs"
+              className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl sm:rounded-2xl border p-1.5 sm:p-2 shrink-0 shadow-2xs"
               style={{ backgroundColor: integration.accentBg, borderColor: `${integration.brandColor}40` }}
             >
               <Image
@@ -141,25 +141,25 @@ export function OAuthModal({
                 alt={integration.name}
                 width={28}
                 height={28}
-                className="h-6 w-6 object-contain"
+                className="h-5 w-5 sm:h-6 sm:w-6 object-contain"
                 unoptimized
               />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-base font-bold text-foreground">{integration.name}</h2>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap sm:flex-nowrap min-w-0">
+                <h2 className="text-xs sm:text-base font-bold text-foreground truncate">{integration.name}</h2>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 whitespace-nowrap shrink-0">
                   Step {step} of 5
                 </span>
               </div>
-              <p className="text-xs text-muted-foreground">{integration.badgeText}</p>
+              <p className="text-[11px] sm:text-xs text-muted-foreground truncate">{integration.badgeText}</p>
             </div>
           </div>
 
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-xl hover:bg-muted text-muted-foreground hover:text-foreground transition-colors cursor-pointer border border-border/40"
+            className="p-1.5 rounded-xl hover:bg-muted text-muted-foreground hover:text-foreground transition-colors cursor-pointer border border-border/40 shrink-0"
           >
             <X className="h-4 w-4" />
           </button>
