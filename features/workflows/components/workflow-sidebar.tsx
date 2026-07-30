@@ -27,7 +27,7 @@ export function WorkflowSidebar({
   onOpenAddWorkflow,
 }: WorkflowSidebarProps) {
   return (
-    <div className="space-y-4 lg:col-span-4">
+    <div className="space-y-4">
       <div className="flex items-center justify-between px-1">
         <span className="text-xs font-extrabold tracking-wider text-muted-foreground uppercase">
           Workflow Library ({workflows.length})
@@ -43,33 +43,33 @@ export function WorkflowSidebar({
             <div
               key={wf.id}
               onClick={() => onSelectWorkflow(wf.id)}
-              className={`group relative cursor-pointer rounded-2xl border p-4 transition-all ${
+              className={`group relative cursor-pointer rounded-2xl border p-3.5 sm:p-4 transition-all min-w-0 ${
                 isSelected
                   ? "border-orange-500/60 bg-orange-500/5 shadow-xs ring-1 ring-orange-500/20"
                   : "border-border/70 bg-card hover:border-border hover:bg-muted/40"
               }`}
             >
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex items-start gap-3">
-                  <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-orange-500/20 bg-orange-500/10 text-orange-500 font-bold">
+              <div className="flex items-start justify-between gap-2.5 sm:gap-3 min-w-0">
+                <div className="flex items-start gap-2.5 sm:gap-3 min-w-0 flex-1">
+                  <div className="mt-0.5 flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-xl border border-orange-500/20 bg-orange-500/10 text-orange-500 font-bold">
                     {wf.title.toLowerCase().includes("client") ? (
-                      <Building2 className="h-4.5 w-4.5" />
+                      <Building2 className="h-4 w-4 sm:h-4.5 sm:w-4.5" />
                     ) : wf.title.toLowerCase().includes("appointment") ? (
-                      <Calendar className="h-4.5 w-4.5 text-blue-500" />
+                      <Calendar className="h-4 w-4 sm:h-4.5 sm:w-4.5 text-blue-500" />
                     ) : wf.title.toLowerCase().includes("urgent") ? (
-                      <ShieldAlert className="h-4.5 w-4.5 text-rose-500" />
+                      <ShieldAlert className="h-4 w-4 sm:h-4.5 sm:w-4.5 text-rose-500" />
                     ) : wf.title.toLowerCase().includes("invoice") ? (
-                      <CreditCard className="h-4.5 w-4.5 text-amber-500" />
+                      <CreditCard className="h-4 w-4 sm:h-4.5 sm:w-4.5 text-amber-500" />
                     ) : (
-                      <LifeBuoy className="h-4.5 w-4.5 text-sky-500" />
+                      <LifeBuoy className="h-4 w-4 sm:h-4.5 sm:w-4.5 text-sky-500" />
                     )}
                   </div>
 
-                  <div>
-                    <h4 className="text-sm font-bold text-foreground group-hover:text-orange-600 dark:group-hover:text-orange-400">
+                  <div className="min-w-0 flex-1">
+                    <h4 className="text-xs sm:text-sm font-bold text-foreground group-hover:text-orange-600 dark:group-hover:text-orange-400 truncate">
                       {wf.title}
                     </h4>
-                    <p className="mt-1 line-clamp-2 text-xs text-muted-foreground leading-snug">
+                    <p className="mt-0.5 sm:mt-1 line-clamp-2 text-[11px] sm:text-xs text-muted-foreground leading-snug">
                       {wf.description}
                     </p>
                   </div>

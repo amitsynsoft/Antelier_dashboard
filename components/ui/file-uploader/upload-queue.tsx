@@ -59,7 +59,7 @@ export function UploadQueue({
               initial={{ opacity: 0, y: -6 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, height: 0 }}
-              className={`flex flex-col gap-2 rounded-xl border p-3.5 text-sm transition-all ${
+              className={`flex flex-col gap-2 rounded-xl border p-2.5 sm:p-3.5 text-xs sm:text-sm transition-all min-w-0 w-full overflow-hidden ${
                 item.stage === "error"
                   ? "border-rose-500/40 bg-rose-500/5"
                   : item.stage !== "success"
@@ -68,9 +68,9 @@ export function UploadQueue({
               }`}
             >
               {item.stage === "success" ? (
-                <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-2.5 min-w-0 w-full overflow-hidden">
                   {getFileIcon(item.name)}
-                  <div className="flex-1">
+                  <div className="flex-1 min-w-0 overflow-hidden">
                     <UploadSuccessState
                       fileName={item.name}
                       formattedSize={item.formattedSize}
@@ -79,10 +79,10 @@ export function UploadQueue({
                   </div>
                 </div>
               ) : item.stage === "error" ? (
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2.5">
+                <div className="space-y-2 min-w-0 w-full overflow-hidden">
+                  <div className="flex items-center gap-2.5 min-w-0">
                     {getFileIcon(item.name)}
-                    <span className="font-semibold text-foreground truncate">
+                    <span className="font-semibold text-foreground truncate min-w-0">
                       {item.name}
                     </span>
                   </div>
@@ -93,10 +93,10 @@ export function UploadQueue({
                   />
                 </div>
               ) : (
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2.5">
+                <div className="space-y-2 min-w-0 w-full overflow-hidden">
+                  <div className="flex items-center gap-2.5 min-w-0">
                     {getFileIcon(item.name)}
-                    <span className="font-semibold text-foreground truncate">
+                    <span className="font-semibold text-foreground truncate min-w-0">
                       {item.name}
                     </span>
                   </div>

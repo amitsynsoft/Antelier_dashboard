@@ -83,7 +83,7 @@ export function Select({
         onClick={() => setIsOpen((prev) => !prev)}
         onKeyDown={handleKeyDown}
         className={cn(
-          "flex h-11 w-full cursor-pointer items-center justify-between rounded-xl border border-input bg-muted/30 px-3.5 text-sm text-foreground shadow-2xs transition-all hover:bg-muted/50 focus:ring-2 focus:ring-primary focus:outline-none disabled:cursor-not-allowed disabled:opacity-50",
+          "flex h-10 sm:h-11 w-full cursor-pointer items-center justify-between rounded-xl border border-input bg-muted/30 px-3 sm:px-3.5 text-xs sm:text-sm text-foreground shadow-2xs transition-all hover:bg-muted/50 focus:ring-2 focus:ring-primary focus:outline-none disabled:cursor-not-allowed disabled:opacity-50",
           isOpen && "border-primary ring-2 ring-primary/20 bg-background",
           className
         )}

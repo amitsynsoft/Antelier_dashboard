@@ -64,24 +64,24 @@ export function BusinessProfileForm({
   ]
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {showTitle && (
-        <div className="space-y-1 border-b border-border/50 pb-4">
-          <h2 className="flex items-center gap-2 text-xl font-bold tracking-tight text-foreground">
-            <Building2 className="h-5 w-5 text-primary" />
-            Business Profile & Intake Positioning
+        <div className="space-y-1 border-b border-border/50 pb-3 sm:pb-4">
+          <h2 className="flex items-center gap-2 text-lg sm:text-xl font-bold tracking-tight text-foreground">
+            <Building2 className="h-4.5 w-4.5 sm:h-5 sm:w-5 text-primary shrink-0" />
+            <span>Business Profile & Intake Positioning</span>
           </h2>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-xs sm:text-sm text-muted-foreground">
             Configure your enterprise branding, target customer segments, and
             primary intake objectives.
           </p>
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3.5 sm:gap-5 sm:grid-cols-2">
         {/* Company Name */}
-        <div className="space-y-2">
-          <label className="text-sm font-semibold text-foreground">
+        <div className="space-y-1.5 sm:space-y-2">
+          <label className="text-xs sm:text-sm font-semibold text-foreground">
             Organization Legal Name
           </label>
           <input
@@ -90,13 +90,13 @@ export function BusinessProfileForm({
             value={data.companyName}
             onChange={handleInputChange}
             placeholder="e.g. Antelier Tech Global"
-            className="h-11 w-full rounded-xl border border-input bg-muted/30 px-3.5 text-sm text-foreground focus:ring-2 focus:ring-ring focus:outline-none"
+            className="h-10 sm:h-11 w-full rounded-xl border border-input bg-muted/30 px-3 sm:px-3.5 text-xs sm:text-sm text-foreground focus:ring-2 focus:ring-ring focus:outline-none"
           />
         </div>
 
         {/* Industry */}
-        <div className="space-y-2">
-          <label className="text-sm font-semibold text-foreground">
+        <div className="space-y-1.5 sm:space-y-2">
+          <label className="text-xs sm:text-sm font-semibold text-foreground">
             Primary Industry Segment
           </label>
           <Select
@@ -114,8 +114,8 @@ export function BusinessProfileForm({
         </div>
 
         {/* Target Tier */}
-        <div className="space-y-2">
-          <label className="text-sm font-semibold text-foreground">
+        <div className="space-y-1.5 sm:space-y-2">
+          <label className="text-xs sm:text-sm font-semibold text-foreground">
             Target Customer Segment
           </label>
           <input
@@ -124,13 +124,13 @@ export function BusinessProfileForm({
             value={data.targetTier}
             onChange={handleInputChange}
             placeholder="e.g. Fortune 500 & Mid-Market"
-            className="h-11 w-full rounded-xl border border-input bg-muted/30 px-3.5 text-sm text-foreground focus:ring-2 focus:ring-ring focus:outline-none"
+            className="h-10 sm:h-11 w-full rounded-xl border border-input bg-muted/30 px-3 sm:px-3.5 text-xs sm:text-sm text-foreground focus:ring-2 focus:ring-ring focus:outline-none"
           />
         </div>
 
         {/* Support Email */}
-        <div className="space-y-2">
-          <label className="text-sm font-semibold text-foreground">
+        <div className="space-y-1.5 sm:space-y-2">
+          <label className="text-xs sm:text-sm font-semibold text-foreground">
             Intake Escalation Email
           </label>
           <input
@@ -139,31 +139,31 @@ export function BusinessProfileForm({
             value={data.supportEmail || ""}
             onChange={handleInputChange}
             placeholder="e.g. intake-ops@antelier.io"
-            className="h-11 w-full rounded-xl border border-input bg-muted/30 px-3.5 text-sm text-foreground focus:ring-2 focus:ring-ring focus:outline-none"
+            className="h-10 sm:h-11 w-full rounded-xl border border-input bg-muted/30 px-3 sm:px-3.5 text-xs sm:text-sm text-foreground focus:ring-2 focus:ring-ring focus:outline-none"
           />
         </div>
 
         {/* Company Website URL */}
-        <div className="space-y-2">
-          <label className="text-sm font-semibold text-foreground">
+        <div className="space-y-1.5 sm:space-y-2">
+          <label className="text-xs sm:text-sm font-semibold text-foreground">
             Organization Website URL
           </label>
           <div className="relative">
-            <Globe className="pointer-events-none absolute top-3.5 left-3.5 h-4 w-4 text-muted-foreground" />
+            <Globe className="pointer-events-none absolute top-3 left-3 sm:top-3.5 sm:left-3.5 h-4 w-4 text-muted-foreground" />
             <input
               type="url"
               name="companyWebsite"
               value={data.companyWebsite || ""}
               onChange={handleInputChange}
               placeholder="https://company.com"
-              className="h-11 w-full rounded-xl border border-input bg-muted/30 pr-3.5 pl-10 text-sm text-foreground focus:ring-2 focus:ring-ring focus:outline-none"
+              className="h-10 sm:h-11 w-full rounded-xl border border-input bg-muted/30 pr-3 sm:pr-3.5 pl-9 sm:pl-10 text-xs sm:text-sm text-foreground focus:ring-2 focus:ring-ring focus:outline-none"
             />
           </div>
         </div>
 
         {/* Company Contact Number */}
-        <div className="space-y-2">
-          <label className="text-sm font-semibold text-foreground">
+        <div className="space-y-1.5 sm:space-y-2">
+          <label className="text-xs sm:text-sm font-semibold text-foreground">
             Organization Contact Number
           </label>
           <PhoneInput
@@ -175,8 +175,8 @@ export function BusinessProfileForm({
       </div>
 
       {/* Primary Intake Goal */}
-      <div className="space-y-2">
-        <label className="text-sm font-semibold text-foreground">
+      <div className="space-y-1.5 sm:space-y-2">
+        <label className="text-xs sm:text-sm font-semibold text-foreground">
           Primary Client Intake Objective
         </label>
         <textarea
@@ -185,17 +185,17 @@ export function BusinessProfileForm({
           onChange={handleInputChange}
           rows={3}
           placeholder="Describe what your AI intake agents should achieve during prospect conversations..."
-          className="w-full resize-none rounded-xl border border-input bg-muted/30 p-3.5 text-sm text-foreground focus:ring-2 focus:ring-ring focus:outline-none"
+          className="w-full resize-none rounded-xl border border-input bg-muted/30 p-3 sm:p-3.5 text-xs sm:text-sm text-foreground focus:ring-2 focus:ring-ring focus:outline-none"
         />
       </div>
 
       {/* Brand Voice / Tone Selector */}
-      <div className="space-y-2.5">
-        <label className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
-          <Sparkles className="h-4 w-4 text-primary" />
-          AI Persona Brand Tone & Style
+      <div className="space-y-2 sm:space-y-2.5">
+        <label className="flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-foreground">
+          <Sparkles className="h-4 w-4 text-primary shrink-0" />
+          <span>AI Persona Brand Tone & Style</span>
         </label>
-        <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-2.5 sm:gap-3.5 sm:grid-cols-2">
           {brandTones.map((tone) => {
             const isSelected = data.brandTone === tone.id
             return (
@@ -205,19 +205,19 @@ export function BusinessProfileForm({
                 onClick={() => {
                   updateBusinessProfile({ brandTone: tone.id })
                 }}
-                className={`cursor-pointer rounded-xl border p-3.5 text-left transition-all ${
+                className={`cursor-pointer rounded-xl border p-3 sm:p-3.5 text-left transition-all ${
                   isSelected
                     ? "border-primary bg-primary/10 ring-1 ring-primary"
                     : "border-border/60 bg-muted/20 hover:bg-muted/40"
                 }`}
               >
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-bold text-foreground">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-xs sm:text-sm font-bold text-foreground">
                     {tone.title}
                   </span>
-                  {isSelected && <Check className="h-4 w-4 text-primary" />}
+                  {isSelected && <Check className="h-4 w-4 text-primary shrink-0" />}
                 </div>
-                <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                <p className="mt-1 text-[11px] sm:text-xs leading-relaxed text-muted-foreground">
                   {tone.desc}
                 </p>
               </button>
@@ -232,9 +232,9 @@ export function BusinessProfileForm({
           <button
             type="button"
             onClick={handleSave}
-            className="flex h-11 cursor-pointer items-center gap-2 rounded-xl bg-primary px-6 text-sm font-bold text-primary-foreground shadow-sm transition-all hover:opacity-90"
+            className="flex h-10 sm:h-11 cursor-pointer items-center gap-2 rounded-xl bg-primary px-5 sm:px-6 text-xs sm:text-sm font-bold text-primary-foreground shadow-sm transition-all hover:opacity-90"
           >
-            <Check className="h-4.5 w-4.5" />
+            <Check className="h-4 w-4 sm:h-4.5 sm:w-4.5" />
             <span>Save Changes</span>
           </button>
         </div>

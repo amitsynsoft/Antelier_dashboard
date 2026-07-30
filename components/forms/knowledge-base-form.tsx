@@ -28,14 +28,14 @@ export function KnowledgeBaseForm({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {showTitle && (
-        <div className="space-y-1 border-b border-border/50 pb-4">
-          <h2 className="flex items-center gap-2 text-xl font-bold tracking-tight text-foreground">
-            <FileText className="h-5 w-5 text-primary" />
-            Knowledge Base & Data Ingestion
+        <div className="space-y-1 border-b border-border/50 pb-3 sm:pb-4">
+          <h2 className="flex items-center gap-2 text-lg sm:text-xl font-bold tracking-tight text-foreground">
+            <FileText className="h-4.5 w-4.5 sm:h-5 sm:w-5 text-primary shrink-0" />
+            <span>Knowledge Base & Data Ingestion</span>
           </h2>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-xs sm:text-sm text-muted-foreground">
             Feed your AI intake agents with enterprise whitepapers, security
             collateral, and RFP documentation.
           </p>
@@ -43,9 +43,9 @@ export function KnowledgeBaseForm({
       )}
 
       {/* Tip Banner */}
-      <div className="flex items-start gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-xs leading-relaxed text-foreground sm:text-sm">
-        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400">
-          <Lightbulb className="h-4 w-4" />
+      <div className="flex items-start gap-2.5 sm:gap-3 rounded-xl sm:rounded-2xl border border-amber-500/30 bg-amber-500/10 p-3 sm:p-4 text-xs sm:text-sm leading-relaxed text-foreground">
+        <div className="flex h-6 w-6 sm:h-7 sm:w-7 shrink-0 items-center justify-center rounded-lg sm:rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400">
+          <Lightbulb className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
         </div>
         <div>
           <span className="font-bold text-foreground">Tip: </span>
@@ -56,8 +56,8 @@ export function KnowledgeBaseForm({
       </div>
 
       {/* Enterprise Reusable FileUploader Suite */}
-      <div className="space-y-2">
-        <label className="text-sm font-semibold text-foreground">
+      <div className="space-y-1.5 sm:space-y-2">
+        <label className="text-xs sm:text-sm font-semibold text-foreground">
           Upload Security & Product Collateral
         </label>
 
@@ -81,7 +81,7 @@ export function KnowledgeBaseForm({
               })
               onSavedNotice?.()
             }}
-            className="flex cursor-pointer items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-2xs transition-all hover:opacity-90"
+            className="flex cursor-pointer items-center gap-2 rounded-xl bg-primary px-4 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-bold text-primary-foreground shadow-2xs transition-all hover:opacity-90"
           >
             <Check className="h-4 w-4" />
 

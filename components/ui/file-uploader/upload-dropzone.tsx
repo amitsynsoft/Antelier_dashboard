@@ -35,7 +35,7 @@ export function UploadDropzone({
   return (
     <div
       {...getRootProps()}
-      className={`group flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed p-7 text-center transition-all ${
+      className={`group flex cursor-pointer flex-col items-center justify-center rounded-xl sm:rounded-2xl border-2 border-dashed p-4 sm:p-7 text-center transition-all ${
         isDragActive
           ? "border-primary bg-primary/10 ring-2 ring-primary/30"
           : disabled
@@ -45,11 +45,11 @@ export function UploadDropzone({
     >
       <input {...getInputProps()} />
 
-      <div className="mb-3 rounded-2xl bg-primary/10 p-3.5 text-primary transition-transform group-hover:scale-110">
-        <UploadCloud className="h-8 w-8" />
+      <div className="mb-2 sm:mb-3 rounded-xl sm:rounded-2xl bg-primary/10 p-2.5 sm:p-3.5 text-primary transition-transform group-hover:scale-110">
+        <UploadCloud className="h-6 w-6 sm:h-8 sm:w-8" />
       </div>
 
-      <span className="text-base font-bold text-foreground">
+      <span className="text-sm sm:text-base font-bold text-foreground">
         {isDragActive
           ? "Drop your files here now"
           : mode === "single"
@@ -57,16 +57,16 @@ export function UploadDropzone({
           : "Click or drag & drop real files here"}
       </span>
 
-      <span className="mt-1 text-xs text-muted-foreground">
+      <span className="mt-0.5 sm:mt-1 text-[11px] sm:text-xs text-muted-foreground">
         Supports {acceptTypesLabel}
       </span>
 
       <button
         type="button"
         tabIndex={-1}
-        className="mt-3.5 inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-xs font-bold text-primary-foreground shadow-2xs transition-all hover:opacity-90 cursor-pointer pointer-events-none"
+        className="mt-2.5 sm:mt-3.5 inline-flex items-center gap-1.5 sm:gap-2 rounded-xl bg-primary px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs font-bold text-primary-foreground shadow-2xs transition-all hover:opacity-90 cursor-pointer pointer-events-none"
       >
-        <FileCheck className="h-4 w-4" />
+        <FileCheck className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
         <span>Browse Files</span>
       </button>
     </div>
