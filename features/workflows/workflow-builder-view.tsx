@@ -281,7 +281,7 @@ export function WorkflowBuilderView() {
       {/* 2-Column Builder Layout */}
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
         {/* Left Column: Workflows Sidebar List (4 cols) */}
-        <div className="sticky top-6 lg:col-span-4">
+        <div className="static lg:sticky lg:top-6 lg:col-span-4">
           <WorkflowSidebar
             workflows={filteredWorkflows}
             selectedWorkflowId={selectedWorkflowId}

@@ -39,32 +39,32 @@ export function IntegrationLogsModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-end bg-background/80 backdrop-blur-sm p-4 sm:p-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-end bg-background/80 backdrop-blur-sm p-3 sm:p-6">
       <motion.div
         initial={{ opacity: 0, x: 40 }}
         animate={{ opacity: 1, x: 0 }}
         exit={{ opacity: 0, x: 40 }}
-        className="w-full max-w-xl h-full max-h-[92vh] rounded-3xl border border-border bg-card text-card-foreground shadow-2xl overflow-hidden flex flex-col"
+        className="w-full max-w-xl h-full max-h-[95vh] sm:max-h-[92vh] rounded-2xl sm:rounded-3xl border border-border bg-card text-card-foreground shadow-2xl overflow-hidden flex flex-col"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border/60 bg-muted/20">
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-background border border-border p-1.5 shrink-0 shadow-2xs">
+        <div className="flex items-center justify-between gap-2 px-3.5 py-3 sm:px-6 sm:py-4 border-b border-border/60 bg-muted/20">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+            <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl bg-background border border-border p-1.5 shrink-0 shadow-2xs">
               <Image
                 src={integration.icon}
                 alt={integration.name}
                 width={24}
                 height={24}
-                className="h-5 w-5 object-contain"
+                className="h-4.5 w-4.5 sm:h-5 sm:w-5 object-contain"
                 unoptimized
               />
             </div>
-            <div>
-              <h2 className="text-sm font-bold text-foreground flex items-center gap-2">
-                <Terminal className="h-4 w-4 text-primary" />
-                {integration.name} API & Sync Logs
+            <div className="min-w-0">
+              <h2 className="text-xs sm:text-sm font-bold text-foreground flex items-center gap-1.5 truncate">
+                <Terminal className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary shrink-0" />
+                <span className="truncate">{integration.name} API & Sync Logs</span>
               </h2>
-              <p className="text-[11px] text-muted-foreground">
+              <p className="text-[10px] sm:text-[11px] text-muted-foreground truncate">
                 Real-time API payloads, status codes, and latency telemetry
               </p>
             </div>
@@ -73,7 +73,7 @@ export function IntegrationLogsModal({
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-xl hover:bg-muted text-muted-foreground hover:text-foreground transition-colors cursor-pointer border border-border/40"
+            className="p-1.5 rounded-xl hover:bg-muted text-muted-foreground hover:text-foreground transition-colors cursor-pointer border border-border/40 shrink-0"
           >
             <X className="h-4 w-4" />
           </button>

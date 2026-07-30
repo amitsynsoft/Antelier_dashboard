@@ -64,18 +64,18 @@ export function IntegrationPromptStudioModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4 sm:p-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-3 sm:p-6">
       <motion.div
         initial={{ opacity: 0, scale: 0.96 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.96 }}
-        className="w-full max-w-3xl max-h-[92vh] rounded-3xl border border-border bg-card text-card-foreground shadow-2xl overflow-hidden flex flex-col"
+        className="w-full max-w-3xl max-h-[95vh] sm:max-h-[92vh] rounded-2xl sm:rounded-3xl border border-border bg-card text-card-foreground shadow-2xl overflow-hidden flex flex-col"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border/60 bg-muted/20">
-          <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between gap-2 px-3.5 py-3 sm:px-6 sm:py-4 border-b border-border/60 bg-muted/20">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
             <div
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border p-2 shadow-2xs"
+              className="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl border p-1.5 sm:p-2 shadow-2xs"
               style={{
                 backgroundColor: integration.accentBg,
                 borderColor: `${integration.brandColor}40`,
@@ -86,16 +86,16 @@ export function IntegrationPromptStudioModal({
                 alt={integration.name}
                 width={28}
                 height={28}
-                className="h-6 w-6 object-contain"
+                className="h-5 w-5 sm:h-6 sm:w-6 object-contain"
                 unoptimized
               />
             </div>
-            <div>
-              <h2 className="text-base font-bold text-foreground flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-primary" />
-                {integration.name} — Prompt Studio
+            <div className="min-w-0">
+              <h2 className="text-xs sm:text-base font-bold text-foreground flex items-center gap-1.5 truncate">
+                <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary shrink-0" />
+                <span className="truncate">{integration.name} — Prompt Studio</span>
               </h2>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-[11px] sm:text-xs text-muted-foreground truncate">
                 Configure AI directives for {integration.name}
               </p>
             </div>
@@ -104,7 +104,7 @@ export function IntegrationPromptStudioModal({
           <button
             type="button"
             onClick={onClose}
-            className="p-2 rounded-xl hover:bg-muted text-muted-foreground hover:text-foreground transition-colors cursor-pointer border border-border/40"
+            className="p-1.5 rounded-xl hover:bg-muted text-muted-foreground hover:text-foreground transition-colors cursor-pointer border border-border/40 shrink-0"
           >
             <X className="h-4 w-4" />
           </button>

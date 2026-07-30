@@ -63,7 +63,7 @@ function CustomCountrySelect({
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 z-50 mt-1.5 max-h-72 w-64 animate-in overflow-hidden rounded-2xl border border-border bg-popover text-popover-foreground shadow-2xl fade-in-50 zoom-in-95">
+        <div className="absolute top-full left-0 z-50 mt-1.5 max-h-72 w-64 max-w-[calc(100vw-2.5rem)] animate-in overflow-hidden rounded-2xl border border-border bg-popover text-popover-foreground shadow-2xl fade-in-50 zoom-in-95">
           {/* Search Header */}
           <div className="border-b border-border/50 bg-muted/20 p-2">
             <div className="relative">
@@ -169,7 +169,7 @@ export function PhoneInput({
 
   return (
     <div
-      className={`antelier-phone-input-wrapper relative flex h-11 items-center rounded-xl border border-input bg-background px-3.5 shadow-2xs transition-all focus-within:border-primary focus-within:ring-2 focus-within:ring-primary ${
+      className={`antelier-phone-input-wrapper relative flex h-10 sm:h-11 items-center rounded-xl border border-input bg-background px-3 sm:px-3.5 shadow-2xs transition-all focus-within:border-primary focus-within:ring-2 focus-within:ring-primary ${
         disabled ? "cursor-not-allowed opacity-60" : ""
       } ${className}`}
     >

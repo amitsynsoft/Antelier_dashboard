@@ -67,34 +67,34 @@ export function WorkflowActionsList({
                 </div>
               )}
 
-              <div className="group relative flex items-center justify-between rounded-2xl border border-border/70 bg-muted/20 p-4 shadow-2xs transition-all hover:border-orange-500/50 hover:bg-card">
-                <div className="flex items-center gap-3.5">
-                  <div className="cursor-grab text-muted-foreground hover:text-foreground transition-colors">
-                    <GripVertical className="h-5 w-5" />
+              <div className="group relative flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border border-border/70 bg-muted/20 p-3.5 sm:p-4 shadow-2xs transition-all hover:border-orange-500/50 hover:bg-card min-w-0">
+                <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0 flex-1">
+                  <div className="cursor-grab text-muted-foreground hover:text-foreground transition-colors shrink-0">
+                    <GripVertical className="h-4.5 w-4.5 sm:h-5 sm:w-5" />
                   </div>
 
                   <div
-                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${meta.colorClass}`}
+                    className={`flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl border ${meta.colorClass}`}
                   >
-                    <IconComp className="h-5 w-5" />
+                    <IconComp className="h-4.5 w-4.5 sm:h-5 sm:w-5" />
                   </div>
 
-                  <div className="space-y-0.5">
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono text-xs font-extrabold text-orange-600 dark:text-orange-400">
+                  <div className="space-y-0.5 min-w-0 flex-1">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="font-mono text-xs font-extrabold text-orange-600 dark:text-orange-400 shrink-0">
                         Step {index + 1}
                       </span>
-                      <h4 className="text-sm font-bold text-foreground">
+                      <h4 className="text-xs sm:text-sm font-bold text-foreground truncate min-w-0">
                         {action.title}
                       </h4>
                     </div>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-[11px] sm:text-xs text-muted-foreground truncate">
                       {action.description}
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-1.5 opacity-90 group-hover:opacity-100">
+                <div className="flex items-center gap-1.5 opacity-90 group-hover:opacity-100 shrink-0 justify-end sm:justify-start pt-1 sm:pt-0 border-t sm:border-t-0 border-border/40 sm:border-transparent">
                   <button
                     type="button"
                     onClick={() => onMoveAction(index, "up")}
